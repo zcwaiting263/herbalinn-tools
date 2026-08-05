@@ -4,133 +4,161 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>HERBALINN 运营工作台</title>
 <style>
-:root{--g1:#1b3b2b;--g2:#2d5a3f;--g3:#3d7a55;--g4:#6ba87a;--bg:#f2f4f3;--card:#fff;--t1:#1a2e22;--t2:#4a5c50;--t3:#7a8c80;--b1:#dce4de;--red:#d44040;--orange:#e8961e;--blue:#3b82c4;--r:12px;--sh:0 2px 10px rgba(0,0,0,.04)}
+:root{
+  --g1:#1a3728;--g2:#2a543c;--g3:#38754e;--g4:#5a9e6c;
+  --bg:#f0f3f1;--card:#fff;--t1:#152218;--t2:#3d4f42;--t3:#7d8f82;--t4:#aab8ae;
+  --b1:#e2e8e4;--b2:#d1d9d3;
+  --red:#d43d3d;--red-bg:#fef3f3;--orange:#e08820;--orange-bg:#fffaf3;--blue:#3b82c4;--blue-bg:#f2f8ff;
+  --r:14px;--rr:10px;--rs:6px;
+  --sh-sm:0 1px 2px rgba(0,0,0,.04);--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);--sh-lg:0 2px 8px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.05);
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;font-size:17px}
-.topbar{background:var(--g1);color:#fff;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.topbar .logo{font-size:18px;font-weight:700;letter-spacing:1px}
-.topbar .identity{background:rgba(255,255,255,.1);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:15px}
-.topbar .identity:hover{background:rgba(255,255,255,.18)}.topbar .identity.set{background:var(--g3)}
-.topbar .hamburger{display:none;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 10px}
-.sidebar{background:var(--g1);width:210px;position:fixed;top:52px;left:0;bottom:0;overflow-y:auto;z-index:40;transition:transform .25s;padding:8px 0}
-.sidebar nav a{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);font-size:16px;text-decoration:none;transition:all .15s;border-left:3px solid transparent}
-.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(255,255,255,.06);border-left-color:var(--g4)}
-.sidebar nav a .badge{background:var(--red);color:#fff;font-size:13px;padding:2px 8px;border-radius:10px;margin-left:auto}
-.main{margin-left:210px;padding:24px;min-height:calc(100vh - 52px)}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased}
 
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.stats-row.six{grid-template-columns:repeat(6,1fr)}
-.stat-card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
-.stat-card .num{font-size:28px;font-weight:700;color:var(--g1)}
-.stat-card .num.r{color:var(--red)}.stat-card .num.o{color:var(--orange)}.stat-card .num.b{color:var(--blue)}
-.stat-card .lbl{font-size:14px;color:var(--t3);margin-top:2px}
+.topbar{background:var(--g1);color:#fff;padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.topbar .logo{font-size:16px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.topbar .logo svg{opacity:.85}
+.topbar .identity{background:rgba(255,255,255,.08);padding:7px 18px;border-radius:20px;cursor:pointer;font-size:14px;transition:all .2s;border:1px solid rgba(255,255,255,.06)}
+.topbar .identity:hover{background:rgba(255,255,255,.14)}.topbar .identity.set{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2)}
+.topbar .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px 10px;border-radius:6px}
+.topbar .hamburger:hover{background:rgba(255,255,255,.08)}
 
-.alerts-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.alerts-row .alert-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:14px;font-size:14px;font-weight:500}
-.alerts-row .alert-chip.danger{background:#fef2f2;color:#991b1b}
-.alerts-row .alert-chip.warning{background:#fffbeb;color:#92400e}
-.alerts-row .alert-chip.info{background:#eff6ff;color:#1e40af}
+.sidebar{background:#fff;width:220px;position:fixed;top:56px;left:0;bottom:0;overflow-y:auto;z-index:40;transition:transform .25s;padding:12px 0;border-right:1px solid var(--b1)}
+.sidebar .s-section{padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:1px}
+.sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 16px;margin:2px 8px;color:var(--t2);font-size:15px;text-decoration:none;transition:all .15s;border-radius:8px;font-weight:450}
+.sidebar nav a:hover{background:#f4f6f4;color:var(--t1)}
+.sidebar nav a.active{background:var(--g2);color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(42,84,60,.2)}
+.sidebar nav a .badge{background:var(--red);color:#fff;font-size:11px;padding:1px 7px;border-radius:10px;margin-left:auto;font-weight:500}
+.sidebar nav a .nav-icon{width:18px;height:18px;opacity:.5;flex-shrink:0}
+.sidebar nav a.active .nav-icon{opacity:1}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.panel{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
-.panel-h{padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:600}
-.panel-b{padding:14px 20px;font-size:15px}
+.main{margin-left:220px;padding:28px;min-height:calc(100vh - 56px)}
 
-/* Pipeline */
-.pipeline-bar{display:flex;align-items:center;gap:6px;margin:8px 0}
-.pipeline-step{flex:1;text-align:center;padding:14px 8px;background:#f7f8f7;border-radius:8px;position:relative}
-.pipeline-step .ps{font-size:22px;font-weight:700;color:var(--g2)}
-.pipeline-step .pl{font-size:13px;color:var(--t3);margin-top:2px}
-.pipeline-arrow{color:var(--t3);font-size:18px;flex-shrink:0}
-.pipeline-rate{font-size:13px;color:var(--blue);margin-top:4px;text-align:center}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);border:1px solid rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.stat-card:hover{transform:translateY(-1px);box-shadow:var(--sh-lg)}
+.stat-card .num{font-size:36px;font-weight:650;line-height:1.1;letter-spacing:-1px}
+.stat-card .num.c1{color:var(--g2)}.stat-card .num.c2{color:var(--red)}.stat-card .num.c3{color:var(--orange)}.stat-card .num.c4{color:var(--blue)}
+.stat-card .lbl{font-size:13px;color:var(--t3);margin-top:6px;font-weight:450}
+.stat-card .sub{font-size:11px;color:var(--t4);margin-top:2px}
 
-.activity-list{max-height:240px;overflow-y:auto}
-.activity-list .al{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;font-size:14px}
-.activity-list .al-time{color:var(--t3);min-width:44px}
-.activity-list .al-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;background:var(--g3)}
+.alerts-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.alert-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;font-size:13px;font-weight:500}
+.alert-chip.danger{background:var(--red-bg);color:#8b1a1a;border:1px solid #fecaca}
+.alert-chip.warning{background:#fffbeb;color:#78350f;border:1px solid #fde68a}
+.alert-chip.info{background:var(--blue-bg);color:#1e3a5f;border:1px solid #bfdbfe}
 
-.qbtn{padding:10px 20px;border:1px solid var(--b1);border-radius:8px;font-size:15px;cursor:pointer;background:var(--card);color:var(--t1);font-weight:500}
-.qbtn:hover,.qbtn.pri{background:var(--g2);color:#fff;border-color:var(--g2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.panel{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;border:1px solid rgba(0,0,0,.02)}
+.panel-h{padding:16px 22px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:550;color:var(--t1)}
+.panel-b{padding:18px 22px;font-size:14px;color:var(--t2)}
 
-/* Inline form */
-.inline-form{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;margin-bottom:14px}
-.inline-form h3{font-size:17px;font-weight:600;margin-bottom:12px}
-.inline-form .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.inline-form .fg{display:flex;flex-direction:column;gap:3px;min-width:130px}
-.inline-form .fg label{font-size:14px;color:var(--t3);font-weight:500}
+.pipeline-bar{display:flex;align-items:center;gap:8px;margin:8px 0}
+.pipeline-step{flex:1;text-align:center;padding:16px 10px;background:#f7f9f7;border-radius:var(--rr);transition:all .15s}
+.pipeline-step:hover{background:#eef2ee}
+.pipeline-step .ps{font-size:26px;font-weight:650;color:var(--g2);letter-spacing:-.5px;line-height:1.2}
+.pipeline-step .pl{font-size:12px;color:var(--t3);margin-top:4px;font-weight:450}
+.pipeline-arrow{color:var(--t4);font-size:16px;flex-shrink:0;font-weight:300}
+
+.activity-list{max-height:260px;overflow-y:auto}
+.activity-list .al{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f4f5f4;font-size:13px;align-items:flex-start}
+.activity-list .al-time{color:var(--t4);min-width:46px;font-size:12px;font-variant-numeric:tabular-nums}
+.activity-list .al-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g3)}
+.activity-list .al-msg{color:var(--t2);flex:1}
+
+.qbtn{padding:10px 22px;border:1px solid var(--b1);border-radius:8px;font-size:14px;cursor:pointer;background:var(--card);color:var(--t1);font-weight:500;transition:all .15s}
+.qbtn:hover{background:#f7f9f7;border-color:var(--b2)}
+.qbtn.pri{background:var(--g2);color:#fff;border-color:var(--g2)}.qbtn.pri:hover{background:var(--g1)}
+
+.inline-form{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:20px 24px;margin-bottom:18px;border:1px solid rgba(0,0,0,.02)}
+.inline-form h3{font-size:16px;font-weight:550;margin-bottom:14px;color:var(--t1)}
+.inline-form .form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.inline-form .fg{display:flex;flex-direction:column;gap:4px;min-width:140px}
+.inline-form .fg label{font-size:12px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
 .inline-form .fg span.r{color:var(--red)}
-.inline-form input,.inline-form select,.inline-form textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:15px;font-family:inherit;outline:none;background:#fff}
-.inline-form input:focus,.inline-form select:focus,.inline-form textarea:focus{border-color:var(--g3)}
-.inline-form textarea{resize:vertical;min-height:50px;max-height:100px}
-.inline-form .btn-submit{padding:9px 24px;background:var(--g2);color:#fff;border:1px solid var(--g2);border-radius:6px;font-size:15px;cursor:pointer;font-weight:600;white-space:nowrap}
-.inline-form .btn-reset{padding:9px 24px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:15px;cursor:pointer;font-weight:600;white-space:nowrap}
+.inline-form input,.inline-form select,.inline-form textarea{width:100%;padding:10px 12px;border:1px solid var(--b1);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fafbfa;transition:border-color .15s,box-shadow .15s}
+.inline-form input:focus,.inline-form select:focus,.inline-form textarea:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(56,117,78,.08);background:#fff}
+.inline-form textarea{resize:vertical;min-height:52px;max-height:110px}
+.inline-form .btn-submit{padding:10px 28px;background:var(--g2);color:#fff;border:1px solid var(--g2);border-radius:8px;font-size:14px;cursor:pointer;font-weight:550;transition:all .15s}
+.inline-form .btn-submit:hover{background:var(--g1);box-shadow:0 2px 8px rgba(42,84,60,.2)}
+.inline-form .btn-reset{padding:10px 28px;background:#f4f5f4;border:1px solid var(--b1);border-radius:8px;font-size:14px;cursor:pointer;font-weight:500;transition:all .15s;color:var(--t2)}
+.inline-form .btn-reset:hover{background:#e8ece8}
 
-/* Table */
-.page-h{margin-bottom:12px}
-.page-h h2{font-size:17px;font-weight:600}
-.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--sh)}
-table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card)}
-th{background:#f7f8f7;padding:11px 14px;text-align:left;font-weight:600;color:var(--t2);border-bottom:2px solid var(--b1);white-space:nowrap}
-td{padding:9px 14px;border-bottom:1px solid #f0f2f0}
-tr:hover td{background:#f9fbf9}
-.tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:13px;font-weight:600}
-.tag-g{background:#e6f4ea;color:var(--g2)}.tag-y{background:#fef7ed;color:#b45309}
-.tag-r{background:#fef2f2;color:#991b1b}.tag-b{background:#eff6ff;color:#1d4ed8}.tag-o{background:#fef3e8;color:#c2410c}
+.page-h{margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.page-h h2{font-size:18px;font-weight:600;display:flex;align-items:center;gap:12px}
+.page-h h2 .arrow-hint{font-size:12px;color:var(--t4);font-weight:400}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--rr);box-shadow:var(--sh);border:1px solid rgba(0,0,0,.02)}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+th{background:#f7f9f7;padding:13px 16px;text-align:left;font-weight:550;color:var(--t2);border-bottom:1px solid var(--b1);white-space:nowrap;font-size:13px;text-transform:uppercase;letter-spacing:.3px}
+td{padding:11px 16px;border-bottom:1px solid #f3f5f3;color:var(--t1)}
+tr:nth-child(even) td{background:#fafcfa}
+tr:hover td{background:#f2f6f2}
+.tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:500}
+.tag-g{background:#e6f6ea;color:var(--g2)}.tag-y{background:#fef6e8;color:#92400e}
+.tag-r{background:#fef2f2;color:#991b1b}.tag-b{background:#eef4ff;color:#1d4ed8}.tag-o{background:#fef5e8;color:#b45309}
 .btns{display:inline-flex;gap:4px}
-.btns button{padding:4px 10px;font-size:13px;border:1px solid var(--b1);border-radius:4px;cursor:pointer;background:#fff;color:var(--t3)}
+.btns button{padding:5px 12px;font-size:12px;border:1px solid var(--b1);border-radius:6px;cursor:pointer;background:#fff;color:var(--t3);transition:all .12s;font-weight:500}
 .btns button:hover{background:#f5f5f5}
 .btns .del{color:var(--red);border-color:#fecaca}.btns .del:hover{background:#fef2f2}
-.btns .edt{color:var(--g2);border-color:var(--g4)}
+.btns .edt{color:var(--g2);border-color:var(--g4)}.btns .edt:hover{background:#f0f8f2}
 
 .module-page{display:none}
 .module-page.active{display:block}
 
-/* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;justify-content:center;align-items:center;padding:16px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:200;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(1px)}
 .modal-overlay.show{display:flex}
-.modal{background:#fff;border-radius:var(--r);width:100%;max-width:660px;max-height:88vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18)}
-.modal-h{padding:18px 22px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
-.modal-h h3{font-size:16px}
-.modal-close{background:none;border:none;font-size:22px;color:var(--t3);cursor:pointer;padding:4px}
-.modal-b{padding:18px 22px}
-.modal-b .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.modal-b .fg{display:flex;flex-direction:column;gap:3px}.modal-b .fg.full{grid-column:1/-1}
-.modal-b .fg label{font-size:14px;color:var(--t3);font-weight:500}
-.modal-b input,.modal-b select,.modal-b textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:15px;font-family:inherit;outline:none}
-.modal-b input:focus,.modal-b select:focus,.modal-b textarea:focus{border-color:var(--g3)}
+.modal{background:#fff;border-radius:var(--r);width:100%;max-width:680px;max-height:88vh;overflow-y:auto;box-shadow:var(--sh-lg);border:1px solid rgba(0,0,0,.04)}
+.modal-h{padding:20px 24px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
+.modal-h h3{font-size:17px;font-weight:600}
+.modal-close{background:none;border:none;font-size:20px;color:var(--t3);cursor:pointer;padding:6px;border-radius:6px;transition:all .15s}
+.modal-close:hover{background:#f4f4f4}
+.modal-b{padding:22px 24px}
+.modal-b .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-b .fg{display:flex;flex-direction:column;gap:4px}.modal-b .fg.full{grid-column:1/-1}
+.modal-b .fg label{font-size:12px;color:var(--t3);font-weight:500}
+.modal-b input,.modal-b select,.modal-b textarea{width:100%;padding:10px 12px;border:1px solid var(--b1);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fafbfa}
+.modal-b input:focus,.modal-b select:focus,.modal-b textarea:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(56,117,78,.08);background:#fff}
 .modal-b textarea{resize:vertical;min-height:60px}
-.modal-f{padding:14px 22px;border-top:1px solid var(--b1);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff}
-.btn-cancel{padding:8px 20px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:15px;cursor:pointer}
-.btn-submit{padding:8px 20px;background:var(--g2);color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;font-weight:600}
+.modal-f{padding:16px 24px;border-top:1px solid var(--b1);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:#fff}
+.btn-cancel{padding:9px 22px;background:#f4f5f4;border:1px solid var(--b1);border-radius:8px;font-size:14px;cursor:pointer;transition:all .15s}
+.btn-cancel:hover{background:#e8ece8}
+.btn-submit{padding:9px 22px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:550;transition:all .15s}
+.btn-submit:hover{background:var(--g1);box-shadow:0 2px 8px rgba(42,84,60,.2)}
 
-/* Identity */
-.identity-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;justify-content:center;align-items:center;padding:16px}
+.identity-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(1px)}
 .identity-modal.show{display:flex}
-.id-card{background:#fff;border-radius:var(--r);padding:36px 32px;width:100%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,.18);text-align:center}
-.id-card h3{font-size:18px;color:var(--g1);margin-bottom:4px}
-.id-card .id-sub{font-size:15px;color:var(--t3);margin-bottom:22px}
-.id-card input{width:100%;padding:12px 14px;border:1px solid var(--b1);border-radius:8px;font-size:17px;margin-bottom:12px;outline:none}
-.id-card input:focus{border-color:var(--g3)}
-.id-card button{width:100%;padding:12px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:17px;cursor:pointer;font-weight:600}
+.id-card{background:#fff;border-radius:var(--r);padding:40px 36px;width:100%;max-width:390px;box-shadow:var(--sh-lg);text-align:center}
+.id-card h3{font-size:20px;color:var(--g1);margin-bottom:6px;font-weight:600}
+.id-card .id-sub{font-size:14px;color:var(--t3);margin-bottom:26px}
+.id-card input{width:100%;padding:13px 16px;border:1px solid var(--b1);border-radius:10px;font-size:16px;margin-bottom:14px;outline:none;transition:all .15s}
+.id-card input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(56,117,78,.08)}
+.id-card button{width:100%;padding:13px;background:var(--g2);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;font-weight:550}
 .id-card button:hover{background:var(--g1)}
-.id-card .skip{display:block;margin-top:14px;font-size:14px;color:var(--t3);cursor:pointer;text-decoration:underline}
+.id-card .skip{display:block;margin-top:16px;font-size:13px;color:var(--t3);cursor:pointer;text-decoration:underline}
 
-.toast{position:fixed;top:18px;right:18px;padding:14px 22px;background:var(--g1);color:#fff;border-radius:8px;font-size:16px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast{position:fixed;top:24px;right:24px;padding:14px 24px;background:var(--g1);color:#fff;border-radius:10px;font-size:14px;z-index:400;opacity:0;transition:all .3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.15)}
 .toast.show{opacity:1}
-.empty{text-align:center;padding:48px 20px;color:var(--t3);font-size:16px}
+.empty{text-align:center;padding:56px 20px;color:var(--t3);font-size:15px}
+
+.export-btn{padding:7px 16px;border:1px solid var(--b1);border-radius:8px;font-size:13px;cursor:pointer;background:var(--card);color:var(--t2);font-weight:500;transition:all .15s;display:flex;align-items:center;gap:6px}
+.export-btn:hover{background:#f7f9f7;border-color:var(--b2)}
+.export-btn svg{opacity:.6}
 
 @media(max-width:900px){
-  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.2)}
-  .main{margin-left:0;padding:14px}.topbar .hamburger{display:block}
-  .stats-row,.stats-row.six{grid-template-columns:repeat(2,1fr);gap:10px}.grid2{grid-template-columns:1fr}
+  .sidebar{transform:translateX(-100%);box-shadow:var(--sh-lg)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:18px}.topbar .hamburger{display:block}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:12px}.grid2{grid-template-columns:1fr}
   .modal-b .form-grid{grid-template-columns:1fr}
   .inline-form .form-row{flex-direction:column}.inline-form .fg{min-width:100%}
-  .pipeline-bar{flex-wrap:wrap}
+  .pipeline-bar{flex-wrap:wrap}.pipeline-step{min-width:80px}
 }
 @media(max-width:500px){
-  .stats-row,.stats-row.six{grid-template-columns:1fr 1fr}.topbar{padding:0 12px;height:44px}.main{padding:10px}
-  .stat-card .num{font-size:22px}
-  table{font-size:13px}th,td{padding:6px 8px}
+  .stats-row{grid-template-columns:1fr 1fr}.topbar{padding:0 16px;height:48px}
+  .main{padding:12px}.panel-h,.panel-b{padding:14px 16px}
+  .stat-card{padding:14px 16px}.stat-card .num{font-size:28px}
+  table{font-size:12px}th,td{padding:8px 10px}
 }
 </style>
 </head>
@@ -138,110 +166,97 @@ tr:hover td{background:#f9fbf9}
 
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <span class="logo">🌿 HERBALINN 运营工作台</span>
+    <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+    <span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c2 0 3.8-.6 5.3-1.6L12 17V7l5 3-5 3"/></svg>HERBALINN 运营工作台</span>
   </div>
   <span class="identity" id="identityBtn" onclick="showIdentity()">未登录</span>
 </div>
 
-<div class="sidebar" id="sidebar"><nav>
-<a href="#" class="active" data-page="dashboard">📊 运营仪表盘</a>
-<a href="#" data-page="content">📝 内容工坊</a>
-<a href="#" data-page="customer">👤 客户中心</a>
-<a href="#" data-page="followup">📋 跟进看板</a>
-<a href="#" data-page="order">📦 订单管理</a>
-<a href="#" data-page="report">📄 自动报告</a>
-<a href="#" data-page="alerts-page">🔔 提醒中心 <span class="badge" id="alertBadge">0</span></a>
+<div class="sidebar" id="sidebar">
+<nav>
+<div class="s-section">概览</div>
+<a href="#" class="active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>运营仪表盘</a>
+<div class="s-section">业务管理</div>
+<a href="#" data-page="content"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>内容工坊</a>
+<a href="#" data-page="customer"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>客户中心</a>
+<a href="#" data-page="followup"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>跟进看板</a>
+<a href="#" data-page="order"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 23 8 20 12 22 16 16 12 16 8"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="18" r="2"/></svg></span>订单管理</a>
+<div class="s-section">分析</div>
+<a href="#" data-page="report"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>自动报告</a>
+<a href="#" data-page="alerts-page"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>提醒中心 <span class="badge" id="alertBadge">0</span></a>
 </nav></div>
 
 <div class="main" id="mainContent">
 
-<!-- DASHBOARD -->
 <div class="module-page active" id="page-dashboard">
-  <div class="stats-row" id="statsRow"></div>
-  <div class="alerts-row" id="alertsRow"></div>
-  
-  <div class="grid2">
-    <div class="panel"><div class="panel-h">📈 增长漏斗（自动汇总各表数据）</div>
-      <div class="panel-b" id="funnelPanel"></div>
-    </div>
-    <div class="panel"><div class="panel-h">🔗 表间关联关系</div>
-      <div class="panel-b" style="font-size:15px;line-height:2.2;color:var(--t2)">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="tag tag-g">内容</span>→<span style="color:var(--t3)">产生线索</span>→<span class="tag tag-b">客户</span>→<span style="color:var(--t3)">跟进推进</span>→<span class="tag tag-o">订单成交</span>
-        </div>
-        <div style="margin-top:8px;color:var(--t3);font-size:14px">
-          ✅ 客户记录来源内容编号 → 跟进绑定客户编号 → 订单关联客户编号<br>
-          ✅ 支付成功自动升级客户阶段 / 跟进成交自动推进<br>
-          ✅ 所有操作全部记录日志可追溯
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="grid2">
-    <div class="panel"><div class="panel-h">📊 内容表现 TOP</div><div class="panel-b" id="topContentPanel"></div></div>
-    <div class="panel"><div class="panel-h">👥 渠道来源分布</div><div class="panel-b" id="sourcePanel"></div></div>
-  </div>
-  
-  <div class="panel"><div class="panel-h">📋 近期动态</div><div class="panel-b"><div class="activity-list" id="activityFeed"></div></div></div>
+<div class="stats-row" id="statsRow"></div>
+<div class="alerts-row" id="alertsRow"></div>
+<div class="grid2">
+<div class="panel"><div class="panel-h">增长漏斗<span style="font-size:12px;color:var(--t4);font-weight:400">近60天自动汇总</span></div><div class="panel-b" id="funnelPanel"></div></div>
+<div class="panel"><div class="panel-h">表间关联</div>
+<div class="panel-b" style="line-height:2.2">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px">
+<span class="tag tag-g">内容</span>&rarr;<span style="color:var(--t3)">产生线索</span>&rarr;<span class="tag tag-b">客户</span>&rarr;<span style="color:var(--t3)">跟进推进</span>&rarr;<span class="tag tag-o">订单成交</span>
+</div>
+<div style="margin-top:10px;color:var(--t3);font-size:12px;line-height:1.8">
+&check; 客户记录来源内容编号 &middot; 跟进绑定客户编号 &middot; 订单关联客户编号<br>
+&check; 支付成功自动升级客户阶段 &middot; 跟进成交自动推进 &middot; 操作可追溯
+</div></div></div>
+</div>
+<div class="grid2">
+<div class="panel"><div class="panel-h">内容表现 TOP</div><div class="panel-b" id="topContentPanel"></div></div>
+<div class="panel"><div class="panel-h">渠道来源分布</div><div class="panel-b" id="sourcePanel"></div></div>
+</div>
+<div class="panel"><div class="panel-h">近期动态</div><div class="panel-b"><div class="activity-list" id="activityFeed"></div></div></div>
 </div>
 
-<!-- CONTENT -->
 <div class="module-page" id="page-content">
-<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('content')">📥 导出Excel</button></div>
+<div class="page-h"><h2>内容工坊 <span class="arrow-hint">&rarr; 产生线索进入客户中心</span></h2><button class="export-btn" onclick="exportCSV('content')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button></div>
 <div class="inline-form" id="form-content"></div>
 <div class="table-wrap"><table id="tbl-content"></table></div>
 </div>
 
-<!-- CUSTOMER -->
 <div class="module-page" id="page-customer">
-<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('customer')">📥 导出Excel</button></div>
+<div class="page-h"><h2>客户中心 <span class="arrow-hint">&larr; 来自内容 &rarr; 进入跟进/订单</span></h2><button class="export-btn" onclick="exportCSV('customer')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button></div>
 <div class="inline-form" id="form-customer"></div>
 <div class="table-wrap"><table id="tbl-customer"></table></div>
 </div>
 
-<!-- FOLLOWUP -->
 <div class="module-page" id="page-followup">
-<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('followup')">📥 导出Excel</button></div>
+<div class="page-h"><h2>跟进看板 <span class="arrow-hint">&larr; 绑定客户编号 &rarr; 成交生成订单</span></h2><button class="export-btn" onclick="exportCSV('followup')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button></div>
 <div class="inline-form" id="form-followup"></div>
 <div class="table-wrap"><table id="tbl-followup"></table></div>
 </div>
 
-<!-- ORDER -->
 <div class="module-page" id="page-order">
-<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('order')">📥 导出Excel</button></div>
+<div class="page-h"><h2>订单管理 <span class="arrow-hint">&larr; 关联客户编号 &middot; 支付&rarr;自动升级客户阶段</span></h2><button class="export-btn" onclick="exportCSV('order')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button></div>
 <div class="inline-form" id="form-order"></div>
 <div class="table-wrap"><table id="tbl-order"></table></div>
 </div>
 
-<!-- REPORT -->
-<div class="module-page" id="page-report"><div class="page-h"><h2>📄 自动报告</h2></div>
+<div class="module-page" id="page-report"><div class="page-h"><h2>自动报告</h2></div>
 <div class="grid2">
-<div class="panel"><div class="panel-h">📅 今日报告 <button class="qbtn" style="font-size:13px;padding:4px 12px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
-<div class="panel"><div class="panel-h">📊 本周汇总 <button class="qbtn" style="font-size:13px;padding:4px 12px" onclick="loadReport('weekly')">刷新</button></div><div class="panel-b" id="weeklyReport"></div></div>
+<div class="panel"><div class="panel-h">今日报告<button class="qbtn" style="font-size:12px;padding:5px 14px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
+<div class="panel"><div class="panel-h">本周汇总<button class="qbtn" style="font-size:12px;padding:5px 14px" onclick="loadReport('weekly')">刷新</button></div><div class="panel-b" id="weeklyReport"></div></div>
 </div></div>
 
-<!-- ALERTS -->
-<div class="module-page" id="page-alerts-page"><div class="page-h"><h2>🔔 提醒中心</h2></div><div id="alertsPageContent"></div></div>
+<div class="module-page" id="page-alerts-page"><div class="page-h"><h2>提醒中心</h2></div><div id="alertsPageContent"></div></div>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-h"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-b" id="modalBody"></div><div class="modal-f"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-submit" onclick="submitModal()">保存</button></div></div></div>
 
-<div class="identity-modal" id="identityModal"><div class="id-card"><h3>🌿 HERBALINN</h3><div class="id-sub">输入姓名和手机号</div><input type="text" id="idName" placeholder="姓名"><input type="tel" id="idPhone" placeholder="手机号"><button onclick="saveIdentity()">开始使用</button><span class="skip" onclick="skipIdentity()">跳过</span></div></div>
+<div class="identity-modal" id="identityModal"><div class="id-card"><h3>HERBALINN</h3><div class="id-sub">输入姓名和手机号</div><input type="text" id="idName" placeholder="姓名"><input type="tel" id="idPhone" placeholder="手机号"><button onclick="saveIdentity()">开始使用</button><span class="skip" onclick="skipIdentity()">跳过</span></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 var userName='',userPhone='',editId=null,editType=null;
 const toast=m=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)};
 function showIdentity(){document.getElementById('identityModal').classList.add('show')}
-function saveIdentity(){const n=document.getElementById('idName').value.trim(),p=document.getElementById('idPhone').value.trim();if(!n||!p){toast('请填写姓名和手机号');return};userName=n;userPhone=p;document.getElementById('identityModal').classList.remove('show');document.getElementById('identityBtn').textContent=n;document.getElementById('identityBtn').classList.add('set');localStorage.setItem('hl_user',JSON.stringify({name:n,phone:p}));toast('你好，'+n)}
+function saveIdentity(){const n=document.getElementById('idName').value.trim(),p=document.getElementById('idPhone').value.trim();if(!n||!p){toast('请填写');return};userName=n;userPhone=p;document.getElementById('identityModal').classList.remove('show');document.getElementById('identityBtn').textContent=n;document.getElementById('identityBtn').classList.add('set');localStorage.setItem('hl_user',JSON.stringify({name:n,phone:p}));toast('你好，'+n)}
 function skipIdentity(){userName='访客';document.getElementById('identityModal').classList.remove('show');document.getElementById('identityBtn').textContent='访客'}
 try{const d=JSON.parse(localStorage.getItem('hl_user'));if(d&&d.name){userName=d.name;userPhone=d.phone;document.getElementById('identityBtn').textContent=d.name;document.getElementById('identityBtn').classList.add('set')}}catch(e){}
 async function api(url,opts={}){const h={'Content-Type':'application/json'};if(userName)h['X-User-Display']=encodeURIComponent(userName);if(userPhone)h['X-User-Phone']=userPhone;const r=await fetch(url,{...opts,headers:{...h,...(opts.headers||{})}});return r.json()}
 
-// NAV
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
 document.querySelectorAll('.sidebar nav a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();switchPage(a.dataset.page);document.getElementById('sidebar').classList.remove('open')}));
 document.getElementById('mainContent').addEventListener('click',()=>document.getElementById('sidebar').classList.remove('open'));
@@ -252,48 +267,44 @@ function switchPage(page){
   if(m[page])m[page]()
 }
 
-// DASHBOARD
 async function loadDashboard(){
   try{
     var s=await api('/api/stats');
-    document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="num">${s.leadCount}</div><div class="lbl">总客户</div></div><div class="stat-card"><div class="num">${s.orderCount}</div><div class="lbl">已支付订单</div></div><div class="stat-card"><div class="num r">${s.overdueCount}</div><div class="lbl">逾期未跟进</div></div><div class="stat-card"><div class="num o">${s.noFollowupCount}</div><div class="lbl">待首次跟进</div></div>`;
-    
+    document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="num c1">${s.leadCount}</div><div class="lbl">总客户</div><div class="sub">转化率 ${s.conversionRate}%</div></div><div class="stat-card"><div class="num c1">${s.orderCount}</div><div class="lbl">已支付订单</div><div class="sub">月卡 ${s.monthCardCount} 人</div></div><div class="stat-card"><div class="num c2">${s.overdueCount}</div><div class="lbl">逾期未跟进</div></div><div class="stat-card"><div class="num c3">${s.noFollowupCount}</div><div class="lbl">待首次跟进</div></div>`;
     var alerts=await api('/api/alerts');
     if(alerts.length>0){document.getElementById('alertsRow').innerHTML=alerts.slice(0,6).map(a=>`<span class="alert-chip ${a.level}">${a.title}: ${a.detail.slice(0,35)}</span>`).join('');document.getElementById('alertBadge').textContent=alerts.length}
     else{document.getElementById('alertsRow').innerHTML='';document.getElementById('alertBadge').textContent='0'}
-    
-    document.getElementById('activityFeed').innerHTML=(s.recentActivity||[]).slice(0,20).map(a=>`<div class="al"><span class="al-time">${(a.created_at||'').slice(11,16)}</span><span class="al-dot"></span><span>${a.message}</span></div>`).join('')||'<div class="empty">暂无动态</div>';
-    
-    // Auto-funnel
+    document.getElementById('activityFeed').innerHTML=(s.recentActivity||[]).slice(0,20).map(a=>`<div class="al"><span class="al-time">${(a.created_at||'').slice(11,16)}</span><span class="al-dot"></span><span class="al-msg">${a.message}</span></div>`).join('')||'<div class="empty">暂无动态</div>';
+
     var f=await api('/api/funnel-auto');
     document.getElementById('funnelPanel').innerHTML=`
-      <div style="font-size:14px;color:var(--t3);margin-bottom:8px">${f.period}</div>
-      <div class="pipeline-bar">
-        <div class="pipeline-step"><div class="ps">${f.publishes}</div><div class="pl">发布内容</div></div>
-        <span class="pipeline-arrow">→</span>
-        <div class="pipeline-step"><div class="ps">${f.leads}</div><div class="pl">获取线索</div></div>
-        <span class="pipeline-arrow">→</span>
-        <div class="pipeline-step"><div class="ps">${f.diagnosed}</div><div class="pl">诊断推进</div></div>
-        <span class="pipeline-arrow">→</span>
-        <div class="pipeline-step"><div class="ps">${f.salesTalks}</div><div class="pl">跟进对话</div></div>
-        <span class="pipeline-arrow">→</span>
-        <div class="pipeline-step"><div class="ps">${f.firstOrders}</div><div class="pl">成交订单</div></div>
-        <span class="pipeline-arrow">→</span>
-        <div class="pipeline-step"><div class="ps">${f.monthlyCards}</div><div class="pl">月卡复购</div></div>
-      </div>
-      <div style="display:flex;gap:16px;margin-top:8px;font-size:14px;color:var(--t3)">
-        <span>转化率: <b style="color:var(--g2)">${f.pipeline.overallConversion}%</b></span>
-        <span>线索→跟进: <b style="color:var(--blue)">${f.pipeline.leadToPipeline}%</b></span>
-        <span>跟进→成交: <b style="color:var(--blue)">${f.pipeline.pipelineToBuy}%</b></span>
-      </div>`;
-    
-    // Top content
+    <div style="font-size:12px;color:var(--t4);margin-bottom:10px">${f.period}</div>
+    <div class="pipeline-bar">
+      <div class="pipeline-step"><div class="ps">${f.publishes}</div><div class="pl">发布内容</div></div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step"><div class="ps">${f.leads}</div><div class="pl">获取线索</div></div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step"><div class="ps">${f.diagnosed}</div><div class="pl">诊断推进</div></div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step"><div class="ps">${f.salesTalks}</div><div class="pl">跟进对话</div></div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step"><div class="ps">${f.firstOrders}</div><div class="pl">成交订单</div></div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step"><div class="ps">${f.monthlyCards}</div><div class="pl">月卡复购</div></div>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:10px;font-size:12px;color:var(--t4)">
+      <span>转化率 <b style="color:var(--g3)">${f.pipeline.overallConversion}%</b></span>
+      <span>线索&rarr;跟进 <b style="color:var(--blue)">${f.pipeline.leadToPipeline}%</b></span>
+      <span>跟进&rarr;成交 <b style="color:var(--blue)">${f.pipeline.pipelineToBuy}%</b></span>
+    </div>`;
+
     document.getElementById('topContentPanel').innerHTML=(f.topContents||[]).length?
-      (f.topContents||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:14px"><span>${(c.copy||c.topic_title||c.content_no||'').slice(0,28)}</span><span style="color:var(--t3)">${c.leads}线索</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无已发布内容</div>';
-    
-    // Source breakdown
+      (f.topContents||[]).map((c,i)=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f6f5;font-size:13px"><span>${i+1}. ${(c.copy||c.topic_title||'').slice(0,24)}</span><span style="color:var(--t4)">${c.leads} 线索</span></div>`).join(''):
+      '<div class="empty">暂无已发布内容</div>';
+
     document.getElementById('sourcePanel').innerHTML=(f.sourceBreakdown||[]).length?
-      (f.sourceBreakdown||[]).map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:14px"><span>${s.source_channel||'未标记'}</span><span style="color:var(--g2);font-weight:600">${s.c}人</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无渠道数据</div>';
+      (f.sourceBreakdown||[]).map(s=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f6f5;font-size:13px"><span>${s.source_channel||'未标记'}</span><span style="color:var(--g2);font-weight:550">${s.c} 人</span></div>`).join(''):
+      '<div class="empty">暂无渠道数据</div>';
   }catch(e){console.error(e)}
 }
 
@@ -305,13 +316,13 @@ order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-202608-001'},{k:'custom
 };
 
 function renderInlineForm(type){
-  var fd=FIELD_DEFS[type],el=document.getElementById('form-'+type),html='<h3>新增'+{content:'内容',customer:'客户',followup:'跟进',order:'订单'}[type]+'</h3><div class="form-row">';
+  var fd=FIELD_DEFS[type],el=document.getElementById('form-'+type),html='<h3>'+(type==='content'?'新增内容':type==='customer'?'新增客户':type==='followup'?'添加跟进':'新增订单')+'</h3><div class="form-row">';
   fd.forEach(f=>{html+=`<div class="fg${f.w?'':''}"><label>${f.l}${f.r?' <span class="r">*</span>':''}</label>`;
     if(f.t==='select')html+=`<select id="if-${f.k}">${(f.o||[]).map(o=>`<option value="${o}">${o||'--'}</option>`).join('')}</select>`;
     else if(f.t==='textarea')html+=`<textarea id="if-${f.k}" rows="2" placeholder="${f.p||''}"></textarea>`;
     else html+=`<input type="${f.t}" id="if-${f.k}" placeholder="${f.p||''}">`;
     html+='</div>'});
-  html+=`</div><div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px"><button class="btn-reset" onclick="resetInline('${type}')">清空</button><button class="btn-submit" onclick="submitInline('${type}')">保存</button></div>`;
+  html+=`</div><div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px"><button class="btn-reset" onclick="resetInline('${type}')">清空</button><button class="btn-submit" onclick="submitInline('${type}')">保存</button></div>`;
   el.innerHTML=html
 }
 async function submitInline(type){
@@ -331,7 +342,7 @@ async function loadTable(type){
     var fd=FIELD_DEFS[type],html='<thead><tr>'+fd.map(f=>`<th>${f.l}</th>`).join('')+'<th></th></tr></thead><tbody>';
     data.forEach(row=>{html+='<tr>'+fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';if(f.k==='status')return`<td>${v==='绿'?'<span class="tag tag-g">绿</span>':v==='黄'?'<span class="tag tag-y">黄</span>':v==='红'?'<span class="tag tag-r">红</span>':v}</td>`;if(f.k==='stage')return`<td><span class="tag tag-b">${v}</span></td>`;if(f.k==='pay_status')return`<td>${v==='已支付'?'<span class="tag tag-g">'+v+'</span>':v}</td>`;var sv=typeof v==='string'&&v.length>30?v.slice(0,28)+'..':v;return`<td>${sv}</td>`}).join('')+`<td><div class="btns"><button class="edt" onclick="editRow('${type}',${row.id})">编辑</button><button class="del" onclick="deleteRow('${type}',${row.id})">删除</button></div></td></tr>`});
     tbl.innerHTML=html+'</tbody>'
-  }catch(e){tbl.innerHTML='<tr><td colspan="99" style="padding:40px;color:#e74c3c;text-align:center">加载失败</td></tr>'}
+  }catch(e){tbl.innerHTML='<tr><td colspan="99" style="padding:40px;color:#d44040;text-align:center">加载失败</td></tr>'}
 }
 
 function openModal(type,row){editType=type;editId=row.id;document.getElementById('modalTitle').textContent='编辑';var fd=FIELD_DEFS[type],html='<div class="form-grid">';fd.forEach(f=>{html+=`<div class="fg${f.w?' full':''}"><label>${f.l}</label>`;if(f.t==='select')html+=`<select name="${f.k}">${(f.o||[]).map(o=>`<option value="${o}">${o||'--'}</option>`).join('')}</select>`;else if(f.t==='textarea')html+=`<textarea name="${f.k}" rows="3">${row[f.k]||''}</textarea>`;else html+=`<input type="${f.t}" name="${f.k}" value="${row[f.k]||''}">`;html+='</div>'});document.getElementById('modalBody').innerHTML=html+'</div>';document.getElementById('modalOverlay').classList.add('show');fd.forEach(f=>{var el=document.querySelector(`[name="${f.k}"]`);if(el&&row[f.k]!==undefined)el.value=row[f.k]})}
@@ -343,11 +354,11 @@ async function deleteRow(type,id){if(!confirm('确认删除？'))return;var r=aw
 async function loadReport(type){
   var r=await api(`/api/report/${type}`);
   var items=[{v:r.publishes,l:'发布'},{v:r.newLeads,l:'新线索'},{v:r.diagnosed,l:'推进'},{v:r.talks,l:'对话'},{v:r.orders,l:'成交'},{v:r.monthlyCards,l:'月卡'}];
-  document.getElementById(type==='daily'?'dailyReport':'weeklyReport').innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:15px">'+items.map(i=>`<div style="text-align:center;padding:10px;background:#f7f8f7;border-radius:6px"><div style="font-size:22px;font-weight:700;color:var(--g2)">${i.v}</div><div style="color:var(--t3);margin-top:2px">${i.l}</div></div>`).join('')+'</div>'
+  document.getElementById(type==='daily'?'dailyReport':'weeklyReport').innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+items.map(i=>`<div style="text-align:center;padding:14px;background:#f7f9f7;border-radius:8px"><div style="font-size:24px;font-weight:650;color:var(--g2)">${i.v}</div><div style="font-size:13px;color:var(--t4);margin-top:4px">${i.l}</div></div>`).join('')+'</div>'
 }
 async function loadAlertsPage(){
   var alerts=await api('/api/alerts');
-  document.getElementById('alertsPageContent').innerHTML=alerts.length?alerts.map(a=>`<div class="panel" style="margin-bottom:8px;border-left:3px solid ${a.level==='danger'?'var(--red)':a.level==='warning'?'var(--orange)':'var(--blue)'}"><div class="panel-h">${a.title} <span style="font-size:14px;font-weight:400;color:var(--t3)">${a.level==='danger'?'紧急':'一般'}</span></div><div class="panel-b" style="font-size:15px">${a.detail}</div></div>`).join(''):'<div class="panel"><div class="panel-b empty">✅ 暂无待处理提醒</div></div>'
+  document.getElementById('alertsPageContent').innerHTML=alerts.length?alerts.map(a=>`<div class="panel" style="margin-bottom:10px;border-left:3px solid ${a.level==='danger'?'var(--red)':'var(--orange)'}"><div class="panel-h">${a.title}<span style="font-size:12px;font-weight:400;color:var(--t4)">${a.level==='danger'?'紧急':'一般'}</span></div><div class="panel-b">${a.detail}</div></div>`).join(''):'<div class="panel"><div class="panel-b empty">无待处理提醒</div></div>'
 }
 
 async function exportCSV(type){
@@ -355,9 +366,7 @@ async function exportCSV(type){
   if(!data.length){toast('暂无数据可导出');return}
   var fd=FIELD_DEFS[type],lbl={content:'内容',customer:'客户',followup:'跟进',order:'订单'};
   var csv='\uFEFF'+fd.map(f=>f.l).join(',')+'\n';
-  data.forEach(row=>{
-    csv+=fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';v=String(v).replace(/"/g,'""');return '"'+v+'"'}).join(',')+'\n';
-  });
+  data.forEach(row=>{csv+=fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';v=String(v).replace(/"/g,'""');return '"'+v+'"'}).join(',')+'\n'});
   var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HERBALINN_'+lbl[type]+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
   toast('已导出 '+data.length+' 条');
