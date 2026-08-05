@@ -1,0 +1,11 @@
+node_modules/
+*.db
+*.db-shm
+*.db-wal
+*.zip
+*.log
+cloudflared.exe
+ngrok.exe
+_auth*.txt
+_login*.txt
+tunnel_test.log
