@@ -191,6 +191,17 @@ tr:hover td{background:#f2f6f2}
 <div class="module-page active" id="page-dashboard">
 <div class="stats-row" id="statsRow"></div>
 <div class="alerts-row" id="alertsRow"></div>
+<div class="panel" style="margin-bottom:16px" id="backupPanel">
+  <div class="panel-h">数据安全 <span style="font-size:12px;color:var(--t4);font-weight:400">更新前先导出，更新后恢复</span></div>
+  <div class="panel-b">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="qbtn" onclick="backupData()" style="font-size:13px;padding:8px 20px">下载备份</button>
+      <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreData(event)">
+      <button class="qbtn" onclick="document.getElementById('restoreFile').click()" style="font-size:13px;padding:8px 20px">导入恢复</button>
+      <span id="dataCount" style="font-size:12px;color:var(--t4)"></span>
+    </div>
+  </div>
+</div>
 <div class="grid2">
 <div class="panel"><div class="panel-h">增长漏斗<span style="font-size:12px;color:var(--t4);font-weight:400">近60天自动汇总</span></div><div class="panel-b" id="funnelPanel"></div></div>
 <div class="panel"><div class="panel-h">表间关联</div>
@@ -268,6 +279,7 @@ function switchPage(page){
 }
 
 async function loadDashboard(){
+  updateDataCount();
   try{
     var s=await api('/api/stats');
     document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="num c1">${s.leadCount}</div><div class="lbl">总客户</div><div class="sub">转化率 ${s.conversionRate}%</div></div><div class="stat-card"><div class="num c1">${s.orderCount}</div><div class="lbl">已支付订单</div><div class="sub">月卡 ${s.monthCardCount} 人</div></div><div class="stat-card"><div class="num c2">${s.overdueCount}</div><div class="lbl">逾期未跟进</div></div><div class="stat-card"><div class="num c3">${s.noFollowupCount}</div><div class="lbl">待首次跟进</div></div>`;
@@ -374,6 +386,29 @@ async function exportCSV(type){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+async function backupData(){
+  var data=await api('/api/backup');
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='HERBALINN_backup_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.json';
+  a.click();toast('已导出 '+data._recordCount+' 条数据');
+}
+async function restoreData(e){
+  var file=e.target.files[0];if(!file)return;
+  try{
+    var data=JSON.parse(await file.text());
+    if(!data._exportedAt){toast('无效备份文件');return}
+    if(!confirm(`确认恢复 ${data._recordCount} 条数据？当前数据将被覆盖。`))return;
+    var r=await api('/api/restore',{method:'POST',body:JSON.stringify(data)});
+    r.ok?(toast('已恢复 '+r.restored+' 条'),loadDashboard()):toast(r.error||'恢复失败');
+  }catch(ex){toast('文件格式错误')}
+  e.target.value='';
+}
+async function updateDataCount(){
+  var d=await api('/api/backup');
+  var el=document.getElementById('dataCount');
+  if(d._recordCount>0)el.textContent='当前存储 '+d._recordCount+' 条数据 &middot; 更新前请先备份';
+}
 loadDashboard();
 </script>
 </body>

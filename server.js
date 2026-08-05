@@ -373,6 +373,41 @@ initDB().then(() => {
     });
   });
 
+  // Data backup & restore
+  app.get('/api/backup',(req,res)=>{
+    const tables = ['contents','customers','followups','orders','funnels','activity_log'];
+    const backup = {};
+    tables.forEach(t => { backup[t] = dbAll(`SELECT * FROM ${t}`); });
+    backup._exportedAt = new Date().toISOString();
+    backup._recordCount = tables.reduce((s,t)=>s+backup[t].length,0);
+    res.json(backup);
+  });
+
+  app.post('/api/restore',(req,res)=>{
+    const user = getUser(req);
+    const tables = ['contents','customers','followups','orders','funnels','activity_log'];
+    let restored = 0;
+    try {
+      tables.forEach(t => {
+        if (req.body[t] && Array.isArray(req.body[t])) {
+          dbRun(`DELETE FROM ${t}`);
+          const cols = getCols(t).filter(c => c!=='id');
+          req.body[t].forEach(row => {
+            const keys = cols.filter(c => row[c] !== undefined);
+            if (keys.length) {
+              const ph = keys.map(()=>'?').join(',');
+              const vals = keys.map(c => row[c]);
+              dbRun(`INSERT INTO ${t} (${keys.join(',')}) VALUES (${ph})`, vals);
+              restored++;
+            }
+          });
+        }
+      });
+      logActivity('restore', `${user} 恢复了 ${restored} 条数据`, 'backup', user);
+      res.json({ok:true, restored});
+    } catch(e) { res.status(400).json({error:e.message}); }
+  });
+
   // Stats
   app.get('/api/stats',(req,res)=>{
     const today=new Date().toISOString().slice(0,10);
