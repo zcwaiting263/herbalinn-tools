@@ -97,11 +97,9 @@ async function logActivity(type, message, relatedId, user) {
   await client.execute({sql:'INSERT INTO activity_log (type,message,related_id,created_by,created_at) VALUES (?,?,?,?,?)',args:[type,message,String(relatedId||''),user||'system',now]});
 }
 
-const PFX={content:'CT',customer:'CU',followup:'FU',order:'OR'};
-function generateNo(prefix, seq) {
-  const now = new Date();const ts=now.toISOString().slice(0,10).replace(/-/g,'').slice(2);
-  return `${PFX[prefix]||prefix.toUpperCase().slice(0,2)}-${ts}-${String(seq+1).padStart(3,'0')}`;
-}
+const PREFIX={content:'CT',customer:'CU',followup:'FU',order:'OR'};
+function generateNo(prefix) { const now=new Date(); const dd=String(now.getDate()).padStart(2,'0'),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'); return prefix+'-'+dd+hh+mm; }
+
 
 
 async function getCols(table) {
