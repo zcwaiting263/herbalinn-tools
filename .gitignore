@@ -9,3 +9,4 @@ ngrok.exe
 _auth*.txt
 _login*.txt
 tunnel_test.log
+bin/
