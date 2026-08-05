@@ -1,18 +1,13 @@
 {
   "name": "herbalinn-tools",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "HERBALINN 自动化运营工具台",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "better-sqlite3": "^13.0.2",
     "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "localtunnel": "^2.0.2"
+    "sql.js": "^1.12.0"
   }
 }
