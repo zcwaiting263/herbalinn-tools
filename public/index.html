@@ -6,16 +6,16 @@
 <style>
 :root{--g1:#1b3b2b;--g2:#2d5a3f;--g3:#3d7a55;--g4:#6ba87a;--bg:#f2f4f3;--card:#fff;--t1:#1a2e22;--t2:#4a5c50;--t3:#7a8c80;--b1:#dce4de;--red:#d44040;--orange:#e8961e;--blue:#3b82c4;--r:12px;--sh:0 2px 10px rgba(0,0,0,.04)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;font-size:15px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;font-size:17px}
 .topbar{background:var(--g1);color:#fff;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .topbar .logo{font-size:18px;font-weight:700;letter-spacing:1px}
-.topbar .identity{background:rgba(255,255,255,.1);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:13px}
+.topbar .identity{background:rgba(255,255,255,.1);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:15px}
 .topbar .identity:hover{background:rgba(255,255,255,.18)}.topbar .identity.set{background:var(--g3)}
 .topbar .hamburger{display:none;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 10px}
 .sidebar{background:var(--g1);width:210px;position:fixed;top:52px;left:0;bottom:0;overflow-y:auto;z-index:40;transition:transform .25s;padding:8px 0}
-.sidebar nav a{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);font-size:14px;text-decoration:none;transition:all .15s;border-left:3px solid transparent}
+.sidebar nav a{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);font-size:16px;text-decoration:none;transition:all .15s;border-left:3px solid transparent}
 .sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(255,255,255,.06);border-left-color:var(--g4)}
-.sidebar nav a .badge{background:var(--red);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:auto}
+.sidebar nav a .badge{background:var(--red);color:#fff;font-size:13px;padding:2px 8px;border-radius:10px;margin-left:auto}
 .main{margin-left:210px;padding:24px;min-height:calc(100vh - 52px)}
 
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
@@ -23,61 +23,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .stat-card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
 .stat-card .num{font-size:28px;font-weight:700;color:var(--g1)}
 .stat-card .num.r{color:var(--red)}.stat-card .num.o{color:var(--orange)}.stat-card .num.b{color:var(--blue)}
-.stat-card .lbl{font-size:12px;color:var(--t3);margin-top:2px}
+.stat-card .lbl{font-size:14px;color:var(--t3);margin-top:2px}
 
 .alerts-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.alerts-row .alert-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:14px;font-size:12px;font-weight:500}
+.alerts-row .alert-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:14px;font-size:14px;font-weight:500}
 .alerts-row .alert-chip.danger{background:#fef2f2;color:#991b1b}
 .alerts-row .alert-chip.warning{background:#fffbeb;color:#92400e}
 .alerts-row .alert-chip.info{background:#eff6ff;color:#1e40af}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .panel{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
-.panel-h{padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}
-.panel-b{padding:14px 20px;font-size:13px}
+.panel-h{padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:600}
+.panel-b{padding:14px 20px;font-size:15px}
 
 /* Pipeline */
 .pipeline-bar{display:flex;align-items:center;gap:6px;margin:8px 0}
 .pipeline-step{flex:1;text-align:center;padding:14px 8px;background:#f7f8f7;border-radius:8px;position:relative}
 .pipeline-step .ps{font-size:22px;font-weight:700;color:var(--g2)}
-.pipeline-step .pl{font-size:11px;color:var(--t3);margin-top:2px}
+.pipeline-step .pl{font-size:13px;color:var(--t3);margin-top:2px}
 .pipeline-arrow{color:var(--t3);font-size:18px;flex-shrink:0}
-.pipeline-rate{font-size:11px;color:var(--blue);margin-top:4px;text-align:center}
+.pipeline-rate{font-size:13px;color:var(--blue);margin-top:4px;text-align:center}
 
 .activity-list{max-height:240px;overflow-y:auto}
-.activity-list .al{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;font-size:12px}
+.activity-list .al{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;font-size:14px}
 .activity-list .al-time{color:var(--t3);min-width:44px}
 .activity-list .al-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;background:var(--g3)}
 
-.qbtn{padding:10px 20px;border:1px solid var(--b1);border-radius:8px;font-size:13px;cursor:pointer;background:var(--card);color:var(--t1);font-weight:500}
+.qbtn{padding:10px 20px;border:1px solid var(--b1);border-radius:8px;font-size:15px;cursor:pointer;background:var(--card);color:var(--t1);font-weight:500}
 .qbtn:hover,.qbtn.pri{background:var(--g2);color:#fff;border-color:var(--g2)}
 
 /* Inline form */
 .inline-form{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;margin-bottom:14px}
-.inline-form h3{font-size:15px;font-weight:600;margin-bottom:12px}
+.inline-form h3{font-size:17px;font-weight:600;margin-bottom:12px}
 .inline-form .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .inline-form .fg{display:flex;flex-direction:column;gap:3px;min-width:130px}
-.inline-form .fg label{font-size:12px;color:var(--t3);font-weight:500}
+.inline-form .fg label{font-size:14px;color:var(--t3);font-weight:500}
 .inline-form .fg span.r{color:var(--red)}
-.inline-form input,.inline-form select,.inline-form textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.inline-form input,.inline-form select,.inline-form textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:15px;font-family:inherit;outline:none;background:#fff}
 .inline-form input:focus,.inline-form select:focus,.inline-form textarea:focus{border-color:var(--g3)}
 .inline-form textarea{resize:vertical;min-height:50px;max-height:100px}
-.inline-form .btn-submit{padding:9px 24px;background:var(--g2);color:#fff;border:1px solid var(--g2);border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;white-space:nowrap}
-.inline-form .btn-reset{padding:9px 24px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;white-space:nowrap}
+.inline-form .btn-submit{padding:9px 24px;background:var(--g2);color:#fff;border:1px solid var(--g2);border-radius:6px;font-size:15px;cursor:pointer;font-weight:600;white-space:nowrap}
+.inline-form .btn-reset{padding:9px 24px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:15px;cursor:pointer;font-weight:600;white-space:nowrap}
 
 /* Table */
 .page-h{margin-bottom:12px}
 .page-h h2{font-size:17px;font-weight:600}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--sh)}
-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card)}
 th{background:#f7f8f7;padding:11px 14px;text-align:left;font-weight:600;color:var(--t2);border-bottom:2px solid var(--b1);white-space:nowrap}
 td{padding:9px 14px;border-bottom:1px solid #f0f2f0}
 tr:hover td{background:#f9fbf9}
-.tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:13px;font-weight:600}
 .tag-g{background:#e6f4ea;color:var(--g2)}.tag-y{background:#fef7ed;color:#b45309}
 .tag-r{background:#fef2f2;color:#991b1b}.tag-b{background:#eff6ff;color:#1d4ed8}.tag-o{background:#fef3e8;color:#c2410c}
 .btns{display:inline-flex;gap:4px}
-.btns button{padding:4px 10px;font-size:11px;border:1px solid var(--b1);border-radius:4px;cursor:pointer;background:#fff;color:var(--t3)}
+.btns button{padding:4px 10px;font-size:13px;border:1px solid var(--b1);border-radius:4px;cursor:pointer;background:#fff;color:var(--t3)}
 .btns button:hover{background:#f5f5f5}
 .btns .del{color:var(--red);border-color:#fecaca}.btns .del:hover{background:#fef2f2}
 .btns .edt{color:var(--g2);border-color:var(--g4)}
@@ -95,29 +95,29 @@ tr:hover td{background:#f9fbf9}
 .modal-b{padding:18px 22px}
 .modal-b .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .modal-b .fg{display:flex;flex-direction:column;gap:3px}.modal-b .fg.full{grid-column:1/-1}
-.modal-b .fg label{font-size:12px;color:var(--t3);font-weight:500}
-.modal-b input,.modal-b select,.modal-b textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:13px;font-family:inherit;outline:none}
+.modal-b .fg label{font-size:14px;color:var(--t3);font-weight:500}
+.modal-b input,.modal-b select,.modal-b textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:15px;font-family:inherit;outline:none}
 .modal-b input:focus,.modal-b select:focus,.modal-b textarea:focus{border-color:var(--g3)}
 .modal-b textarea{resize:vertical;min-height:60px}
 .modal-f{padding:14px 22px;border-top:1px solid var(--b1);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff}
-.btn-cancel{padding:8px 20px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:13px;cursor:pointer}
-.btn-submit{padding:8px 20px;background:var(--g2);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600}
+.btn-cancel{padding:8px 20px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:15px;cursor:pointer}
+.btn-submit{padding:8px 20px;background:var(--g2);color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;font-weight:600}
 
 /* Identity */
 .identity-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;justify-content:center;align-items:center;padding:16px}
 .identity-modal.show{display:flex}
 .id-card{background:#fff;border-radius:var(--r);padding:36px 32px;width:100%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,.18);text-align:center}
 .id-card h3{font-size:18px;color:var(--g1);margin-bottom:4px}
-.id-card .id-sub{font-size:13px;color:var(--t3);margin-bottom:22px}
-.id-card input{width:100%;padding:12px 14px;border:1px solid var(--b1);border-radius:8px;font-size:15px;margin-bottom:12px;outline:none}
+.id-card .id-sub{font-size:15px;color:var(--t3);margin-bottom:22px}
+.id-card input{width:100%;padding:12px 14px;border:1px solid var(--b1);border-radius:8px;font-size:17px;margin-bottom:12px;outline:none}
 .id-card input:focus{border-color:var(--g3)}
-.id-card button{width:100%;padding:12px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600}
+.id-card button{width:100%;padding:12px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:17px;cursor:pointer;font-weight:600}
 .id-card button:hover{background:var(--g1)}
-.id-card .skip{display:block;margin-top:14px;font-size:12px;color:var(--t3);cursor:pointer;text-decoration:underline}
+.id-card .skip{display:block;margin-top:14px;font-size:14px;color:var(--t3);cursor:pointer;text-decoration:underline}
 
-.toast{position:fixed;top:18px;right:18px;padding:14px 22px;background:var(--g1);color:#fff;border-radius:8px;font-size:14px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast{position:fixed;top:18px;right:18px;padding:14px 22px;background:var(--g1);color:#fff;border-radius:8px;font-size:16px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{opacity:1}
-.empty{text-align:center;padding:48px 20px;color:var(--t3);font-size:14px}
+.empty{text-align:center;padding:48px 20px;color:var(--t3);font-size:16px}
 
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.2)}
@@ -130,7 +130,7 @@ tr:hover td{background:#f9fbf9}
 @media(max-width:500px){
   .stats-row,.stats-row.six{grid-template-columns:1fr 1fr}.topbar{padding:0 12px;height:44px}.main{padding:10px}
   .stat-card .num{font-size:22px}
-  table{font-size:11px}th,td{padding:6px 8px}
+  table{font-size:13px}th,td{padding:6px 8px}
 }
 </style>
 </head>
@@ -166,11 +166,11 @@ tr:hover td{background:#f9fbf9}
       <div class="panel-b" id="funnelPanel"></div>
     </div>
     <div class="panel"><div class="panel-h">🔗 表间关联关系</div>
-      <div class="panel-b" style="font-size:13px;line-height:2.2;color:var(--t2)">
+      <div class="panel-b" style="font-size:15px;line-height:2.2;color:var(--t2)">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span class="tag tag-g">内容</span>→<span style="color:var(--t3)">产生线索</span>→<span class="tag tag-b">客户</span>→<span style="color:var(--t3)">跟进推进</span>→<span class="tag tag-o">订单成交</span>
         </div>
-        <div style="margin-top:8px;color:var(--t3);font-size:12px">
+        <div style="margin-top:8px;color:var(--t3);font-size:14px">
           ✅ 客户记录来源内容编号 → 跟进绑定客户编号 → 订单关联客户编号<br>
           ✅ 支付成功自动升级客户阶段 / 跟进成交自动推进<br>
           ✅ 所有操作全部记录日志可追溯
@@ -189,28 +189,28 @@ tr:hover td{background:#f9fbf9}
 
 <!-- CONTENT -->
 <div class="module-page" id="page-content">
-<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('content')">📥 导出Excel</button></div>
+<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('content')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-content"></div>
 <div class="table-wrap"><table id="tbl-content"></table></div>
 </div>
 
 <!-- CUSTOMER -->
 <div class="module-page" id="page-customer">
-<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('customer')">📥 导出Excel</button></div>
+<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('customer')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-customer"></div>
 <div class="table-wrap"><table id="tbl-customer"></table></div>
 </div>
 
 <!-- FOLLOWUP -->
 <div class="module-page" id="page-followup">
-<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('followup')">📥 导出Excel</button></div>
+<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('followup')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-followup"></div>
 <div class="table-wrap"><table id="tbl-followup"></table></div>
 </div>
 
 <!-- ORDER -->
 <div class="module-page" id="page-order">
-<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('order')">📥 导出Excel</button></div>
+<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:14px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2><button class="qbtn" style="font-size:13px;padding:5px 14px" onclick="exportCSV('order')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-order"></div>
 <div class="table-wrap"><table id="tbl-order"></table></div>
 </div>
@@ -218,8 +218,8 @@ tr:hover td{background:#f9fbf9}
 <!-- REPORT -->
 <div class="module-page" id="page-report"><div class="page-h"><h2>📄 自动报告</h2></div>
 <div class="grid2">
-<div class="panel"><div class="panel-h">📅 今日报告 <button class="qbtn" style="font-size:11px;padding:4px 12px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
-<div class="panel"><div class="panel-h">📊 本周汇总 <button class="qbtn" style="font-size:11px;padding:4px 12px" onclick="loadReport('weekly')">刷新</button></div><div class="panel-b" id="weeklyReport"></div></div>
+<div class="panel"><div class="panel-h">📅 今日报告 <button class="qbtn" style="font-size:13px;padding:4px 12px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
+<div class="panel"><div class="panel-h">📊 本周汇总 <button class="qbtn" style="font-size:13px;padding:4px 12px" onclick="loadReport('weekly')">刷新</button></div><div class="panel-b" id="weeklyReport"></div></div>
 </div></div>
 
 <!-- ALERTS -->
@@ -267,7 +267,7 @@ async function loadDashboard(){
     // Auto-funnel
     var f=await api('/api/funnel-auto');
     document.getElementById('funnelPanel').innerHTML=`
-      <div style="font-size:12px;color:var(--t3);margin-bottom:8px">${f.period}</div>
+      <div style="font-size:14px;color:var(--t3);margin-bottom:8px">${f.period}</div>
       <div class="pipeline-bar">
         <div class="pipeline-step"><div class="ps">${f.publishes}</div><div class="pl">发布内容</div></div>
         <span class="pipeline-arrow">→</span>
@@ -281,7 +281,7 @@ async function loadDashboard(){
         <span class="pipeline-arrow">→</span>
         <div class="pipeline-step"><div class="ps">${f.monthlyCards}</div><div class="pl">月卡复购</div></div>
       </div>
-      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--t3)">
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:14px;color:var(--t3)">
         <span>转化率: <b style="color:var(--g2)">${f.pipeline.overallConversion}%</b></span>
         <span>线索→跟进: <b style="color:var(--blue)">${f.pipeline.leadToPipeline}%</b></span>
         <span>跟进→成交: <b style="color:var(--blue)">${f.pipeline.pipelineToBuy}%</b></span>
@@ -289,11 +289,11 @@ async function loadDashboard(){
     
     // Top content
     document.getElementById('topContentPanel').innerHTML=(f.topContents||[]).length?
-      (f.topContents||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px"><span>${(c.copy||c.topic_title||c.content_no||'').slice(0,28)}</span><span style="color:var(--t3)">${c.leads}线索</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无已发布内容</div>';
+      (f.topContents||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:14px"><span>${(c.copy||c.topic_title||c.content_no||'').slice(0,28)}</span><span style="color:var(--t3)">${c.leads}线索</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无已发布内容</div>';
     
     // Source breakdown
     document.getElementById('sourcePanel').innerHTML=(f.sourceBreakdown||[]).length?
-      (f.sourceBreakdown||[]).map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px"><span>${s.source_channel||'未标记'}</span><span style="color:var(--g2);font-weight:600">${s.c}人</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无渠道数据</div>';
+      (f.sourceBreakdown||[]).map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:14px"><span>${s.source_channel||'未标记'}</span><span style="color:var(--g2);font-weight:600">${s.c}人</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无渠道数据</div>';
   }catch(e){console.error(e)}
 }
 
@@ -343,11 +343,11 @@ async function deleteRow(type,id){if(!confirm('确认删除？'))return;var r=aw
 async function loadReport(type){
   var r=await api(`/api/report/${type}`);
   var items=[{v:r.publishes,l:'发布'},{v:r.newLeads,l:'新线索'},{v:r.diagnosed,l:'推进'},{v:r.talks,l:'对话'},{v:r.orders,l:'成交'},{v:r.monthlyCards,l:'月卡'}];
-  document.getElementById(type==='daily'?'dailyReport':'weeklyReport').innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:13px">'+items.map(i=>`<div style="text-align:center;padding:10px;background:#f7f8f7;border-radius:6px"><div style="font-size:22px;font-weight:700;color:var(--g2)">${i.v}</div><div style="color:var(--t3);margin-top:2px">${i.l}</div></div>`).join('')+'</div>'
+  document.getElementById(type==='daily'?'dailyReport':'weeklyReport').innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:15px">'+items.map(i=>`<div style="text-align:center;padding:10px;background:#f7f8f7;border-radius:6px"><div style="font-size:22px;font-weight:700;color:var(--g2)">${i.v}</div><div style="color:var(--t3);margin-top:2px">${i.l}</div></div>`).join('')+'</div>'
 }
 async function loadAlertsPage(){
   var alerts=await api('/api/alerts');
-  document.getElementById('alertsPageContent').innerHTML=alerts.length?alerts.map(a=>`<div class="panel" style="margin-bottom:8px;border-left:3px solid ${a.level==='danger'?'var(--red)':a.level==='warning'?'var(--orange)':'var(--blue)'}"><div class="panel-h">${a.title} <span style="font-size:12px;font-weight:400;color:var(--t3)">${a.level==='danger'?'紧急':'一般'}</span></div><div class="panel-b" style="font-size:13px">${a.detail}</div></div>`).join(''):'<div class="panel"><div class="panel-b empty">✅ 暂无待处理提醒</div></div>'
+  document.getElementById('alertsPageContent').innerHTML=alerts.length?alerts.map(a=>`<div class="panel" style="margin-bottom:8px;border-left:3px solid ${a.level==='danger'?'var(--red)':a.level==='warning'?'var(--orange)':'var(--blue)'}"><div class="panel-h">${a.title} <span style="font-size:14px;font-weight:400;color:var(--t3)">${a.level==='danger'?'紧急':'一般'}</span></div><div class="panel-b" style="font-size:15px">${a.detail}</div></div>`).join(''):'<div class="panel"><div class="panel-b empty">✅ 暂无待处理提醒</div></div>'
 }
 
 async function exportCSV(type){
