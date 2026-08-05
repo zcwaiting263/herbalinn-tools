@@ -2,52 +2,59 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>HERBALINN 运营工具台</title>
+<title>HERBALINN 运营工作台</title>
 <style>
-:root{--g1:#1b3b2b;--g2:#2d5a3f;--g3:#3d7a55;--g4:#6ba87a;--bg:#f2f4f3;--card:#fff;--t1:#1a2e22;--t2:#4a5c50;--t3:#7a8c80;--b1:#dce4de;--b2:#c8d4ca;--red:#d44040;--orange:#e8961e;--blue:#3b82c4;--r:12px;--sh:0 2px 10px rgba(0,0,0,.04)}
+:root{--g1:#1b3b2b;--g2:#2d5a3f;--g3:#3d7a55;--g4:#6ba87a;--bg:#f2f4f3;--card:#fff;--t1:#1a2e22;--t2:#4a5c50;--t3:#7a8c80;--b1:#dce4de;--red:#d44040;--orange:#e8961e;--blue:#3b82c4;--r:12px;--sh:0 2px 10px rgba(0,0,0,.04)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;font-size:15px}
 .topbar{background:var(--g1);color:#fff;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .topbar .logo{font-size:18px;font-weight:700;letter-spacing:1px}
-.topbar .user-area{display:flex;align-items:center;gap:10px}
 .topbar .identity{background:rgba(255,255,255,.1);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:13px}
-.topbar .identity:hover{background:rgba(255,255,255,.18)}
-.topbar .identity.set{background:var(--g3)}
+.topbar .identity:hover{background:rgba(255,255,255,.18)}.topbar .identity.set{background:var(--g3)}
 .topbar .hamburger{display:none;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 10px}
 .sidebar{background:var(--g1);width:210px;position:fixed;top:52px;left:0;bottom:0;overflow-y:auto;z-index:40;transition:transform .25s;padding:8px 0}
 .sidebar nav a{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);font-size:14px;text-decoration:none;transition:all .15s;border-left:3px solid transparent}
 .sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(255,255,255,.06);border-left-color:var(--g4)}
 .sidebar nav a .badge{background:var(--red);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:auto}
 .main{margin-left:210px;padding:24px;min-height:calc(100vh - 52px)}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.stat-card{background:var(--card);border-radius:var(--r);padding:22px 24px;box-shadow:var(--sh)}
-.stat-card .num{font-size:34px;font-weight:700;color:var(--g1)}
-.stat-card .num.r{color:var(--red)}.stat-card .num.o{color:var(--orange)}
-.stat-card .lbl{font-size:13px;color:var(--t3);margin-top:4px}
-.stat-card .sub{font-size:11px;color:var(--t3);margin-top:1px}
-.alerts-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stats-row.six{grid-template-columns:repeat(6,1fr)}
+.stat-card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.stat-card .num{font-size:28px;font-weight:700;color:var(--g1)}
+.stat-card .num.r{color:var(--red)}.stat-card .num.o{color:var(--orange)}.stat-card .num.b{color:var(--blue)}
+.stat-card .lbl{font-size:12px;color:var(--t3);margin-top:2px}
+
+.alerts-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .alerts-row .alert-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:14px;font-size:12px;font-weight:500}
 .alerts-row .alert-chip.danger{background:#fef2f2;color:#991b1b}
 .alerts-row .alert-chip.warning{background:#fffbeb;color:#92400e}
 .alerts-row .alert-chip.info{background:#eff6ff;color:#1e40af}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .panel{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
-.panel-h{padding:15px 20px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}
-.panel-b{padding:14px 20px}
-.stage-bar{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
-.stage-chip{flex:1;text-align:center;padding:14px 8px;border:1px solid var(--b1);border-radius:8px;min-width:70px}
-.stage-chip .sc{font-size:24px;font-weight:700;color:var(--g2)}
-.stage-chip .sn{font-size:11px;color:var(--t3);margin-top:3px}
-.activity-list{max-height:260px;overflow-y:auto}
+.panel-h{padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}
+.panel-b{padding:14px 20px;font-size:13px}
+
+/* Pipeline */
+.pipeline-bar{display:flex;align-items:center;gap:6px;margin:8px 0}
+.pipeline-step{flex:1;text-align:center;padding:14px 8px;background:#f7f8f7;border-radius:8px;position:relative}
+.pipeline-step .ps{font-size:22px;font-weight:700;color:var(--g2)}
+.pipeline-step .pl{font-size:11px;color:var(--t3);margin-top:2px}
+.pipeline-arrow{color:var(--t3);font-size:18px;flex-shrink:0}
+.pipeline-rate{font-size:11px;color:var(--blue);margin-top:4px;text-align:center}
+
+.activity-list{max-height:240px;overflow-y:auto}
 .activity-list .al{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;font-size:12px}
-.activity-list .al .al-time{color:var(--t3);min-width:44px}
-.activity-list .al .al-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;background:var(--g3)}
+.activity-list .al-time{color:var(--t3);min-width:44px}
+.activity-list .al-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;background:var(--g3)}
+
 .qbtn{padding:10px 20px;border:1px solid var(--b1);border-radius:8px;font-size:13px;cursor:pointer;background:var(--card);color:var(--t1);font-weight:500}
 .qbtn:hover,.qbtn.pri{background:var(--g2);color:#fff;border-color:var(--g2)}
 
-/* ====== INLINE FORM ====== */
+/* Inline form */
 .inline-form{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;margin-bottom:14px}
-.inline-form h3{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--t1)}
+.inline-form h3{font-size:15px;font-weight:600;margin-bottom:12px}
 .inline-form .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .inline-form .fg{display:flex;flex-direction:column;gap:3px;min-width:130px}
 .inline-form .fg label{font-size:12px;color:var(--t3);font-weight:500}
@@ -56,11 +63,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .inline-form input:focus,.inline-form select:focus,.inline-form textarea:focus{border-color:var(--g3)}
 .inline-form textarea{resize:vertical;min-height:50px;max-height:100px}
 .inline-form .btn-submit{padding:9px 24px;background:var(--g2);color:#fff;border:1px solid var(--g2);border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;white-space:nowrap}
-.inline-form .btn-submit:hover{background:var(--g1)}
 .inline-form .btn-reset{padding:9px 24px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;white-space:nowrap}
 
-/* ====== TABLE ====== */
-.page-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+/* Table */
+.page-h{margin-bottom:12px}
 .page-h h2{font-size:17px;font-weight:600}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--sh)}
 table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card)}
@@ -69,7 +75,7 @@ td{padding:9px 14px;border-bottom:1px solid #f0f2f0}
 tr:hover td{background:#f9fbf9}
 .tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
 .tag-g{background:#e6f4ea;color:var(--g2)}.tag-y{background:#fef7ed;color:#b45309}
-.tag-r{background:#fef2f2;color:#991b1b}.tag-b{background:#eff6ff;color:#1d4ed8}
+.tag-r{background:#fef2f2;color:#991b1b}.tag-b{background:#eff6ff;color:#1d4ed8}.tag-o{background:#fef3e8;color:#c2410c}
 .btns{display:inline-flex;gap:4px}
 .btns button{padding:4px 10px;font-size:11px;border:1px solid var(--b1);border-radius:4px;cursor:pointer;background:#fff;color:var(--t3)}
 .btns button:hover{background:#f5f5f5}
@@ -79,7 +85,7 @@ tr:hover td{background:#f9fbf9}
 .module-page{display:none}
 .module-page.active{display:block}
 
-/* ====== MODAL (edit only) ====== */
+/* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;justify-content:center;align-items:center;padding:16px}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:var(--r);width:100%;max-width:660px;max-height:88vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18)}
@@ -88,10 +94,8 @@ tr:hover td{background:#f9fbf9}
 .modal-close{background:none;border:none;font-size:22px;color:var(--t3);cursor:pointer;padding:4px}
 .modal-b{padding:18px 22px}
 .modal-b .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.modal-b .fg{display:flex;flex-direction:column;gap:3px}
-.modal-b .fg.full{grid-column:1/-1}
+.modal-b .fg{display:flex;flex-direction:column;gap:3px}.modal-b .fg.full{grid-column:1/-1}
 .modal-b .fg label{font-size:12px;color:var(--t3);font-weight:500}
-.modal-b .fg span.r{color:var(--red)}
 .modal-b input,.modal-b select,.modal-b textarea{width:100%;padding:9px 11px;border:1px solid var(--b1);border-radius:6px;font-size:13px;font-family:inherit;outline:none}
 .modal-b input:focus,.modal-b select:focus,.modal-b textarea:focus{border-color:var(--g3)}
 .modal-b textarea{resize:vertical;min-height:60px}
@@ -99,7 +103,7 @@ tr:hover td{background:#f9fbf9}
 .btn-cancel{padding:8px 20px;background:#f3f4f3;border:1px solid var(--b1);border-radius:6px;font-size:13px;cursor:pointer}
 .btn-submit{padding:8px 20px;background:var(--g2);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600}
 
-/* ====== IDENTITY MODAL ====== */
+/* Identity */
 .identity-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;justify-content:center;align-items:center;padding:16px}
 .identity-modal.show{display:flex}
 .id-card{background:#fff;border-radius:var(--r);padding:36px 32px;width:100%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,.18);text-align:center}
@@ -118,98 +122,101 @@ tr:hover td{background:#f9fbf9}
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.2)}
   .main{margin-left:0;padding:14px}.topbar .hamburger{display:block}
-  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}.grid2{grid-template-columns:1fr}
-  .stat-card{padding:16px 18px}.stat-card .num{font-size:28px}
+  .stats-row,.stats-row.six{grid-template-columns:repeat(2,1fr);gap:10px}.grid2{grid-template-columns:1fr}
   .modal-b .form-grid{grid-template-columns:1fr}
-  .inline-form .form-row{flex-direction:column}
-  .inline-form .fg{min-width:100%}
+  .inline-form .form-row{flex-direction:column}.inline-form .fg{min-width:100%}
+  .pipeline-bar{flex-wrap:wrap}
 }
 @media(max-width:500px){
-  .stats-row{grid-template-columns:1fr 1fr}.topbar{padding:0 12px;height:44px}.main{padding:10px}
+  .stats-row,.stats-row.six{grid-template-columns:1fr 1fr}.topbar{padding:0 12px;height:44px}.main{padding:10px}
+  .stat-card .num{font-size:22px}
   table{font-size:11px}th,td{padding:6px 8px}
 }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
-    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
-    <span class="logo">🌿 HERBALINN 运营工具台</span>
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <span class="logo">🌿 HERBALINN 运营工作台</span>
   </div>
-  <div class="user-area"><span class="identity" id="identityBtn" onclick="showIdentity()">未登录</span></div>
+  <span class="identity" id="identityBtn" onclick="showIdentity()">未登录</span>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar"><nav>
-<a href="#" class="active" data-page="dashboard">📊 仪表盘</a>
+<a href="#" class="active" data-page="dashboard">📊 运营仪表盘</a>
 <a href="#" data-page="content">📝 内容工坊</a>
 <a href="#" data-page="customer">👤 客户中心</a>
 <a href="#" data-page="followup">📋 跟进看板</a>
 <a href="#" data-page="order">📦 订单管理</a>
-<a href="#" data-page="funnel">📈 漏斗数据</a>
 <a href="#" data-page="report">📄 自动报告</a>
 <a href="#" data-page="alerts-page">🔔 提醒中心 <span class="badge" id="alertBadge">0</span></a>
 </nav></div>
 
-<!-- MAIN -->
 <div class="main" id="mainContent">
 
+<!-- DASHBOARD -->
 <div class="module-page active" id="page-dashboard">
-<div class="stats-row" id="statsRow"></div>
-<div class="alerts-row" id="alertsRow"></div>
-<div class="grid2">
-<div class="panel"><div class="panel-h">客户阶段分布</div><div class="panel-b"><div class="stage-bar" id="stageBar"></div></div></div>
-<div class="panel"><div class="panel-h">近期动态</div><div class="panel-b"><div class="activity-list" id="activityFeed"></div></div></div>
-</div>
-<div class="panel"><div class="panel-h">🔗 自动化引擎</div><div class="panel-b" style="font-size:13px;line-height:2;color:var(--t3)">✅ 客户确诊→自动日志 &nbsp; ✅ 跟进成交→"待体验" &nbsp; ✅ 支付成功→升级状态 &nbsp; ✅ 全操作可追溯</div></div>
-<div style="margin-top:14px"><div style="display:flex;gap:8px;flex-wrap:wrap">
-<button class="qbtn pri" onclick="switchPage('content')">📝 内容工坊</button>
-<button class="qbtn" onclick="switchPage('customer')">👤 客户中心</button>
-<button class="qbtn" onclick="switchPage('followup')">📋 跟进看板</button>
-<button class="qbtn" onclick="switchPage('report');loadReport('daily')">📄 今日报告</button>
-</div></div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="alerts-row" id="alertsRow"></div>
+  
+  <div class="grid2">
+    <div class="panel"><div class="panel-h">📈 增长漏斗（自动汇总各表数据）</div>
+      <div class="panel-b" id="funnelPanel"></div>
+    </div>
+    <div class="panel"><div class="panel-h">🔗 表间关联关系</div>
+      <div class="panel-b" style="font-size:13px;line-height:2.2;color:var(--t2)">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="tag tag-g">内容</span>→<span style="color:var(--t3)">产生线索</span>→<span class="tag tag-b">客户</span>→<span style="color:var(--t3)">跟进推进</span>→<span class="tag tag-o">订单成交</span>
+        </div>
+        <div style="margin-top:8px;color:var(--t3);font-size:12px">
+          ✅ 客户记录来源内容编号 → 跟进绑定客户编号 → 订单关联客户编号<br>
+          ✅ 支付成功自动升级客户阶段 / 跟进成交自动推进<br>
+          ✅ 所有操作全部记录日志可追溯
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="grid2">
+    <div class="panel"><div class="panel-h">📊 内容表现 TOP</div><div class="panel-b" id="topContentPanel"></div></div>
+    <div class="panel"><div class="panel-h">👥 渠道来源分布</div><div class="panel-b" id="sourcePanel"></div></div>
+  </div>
+  
+  <div class="panel"><div class="panel-h">📋 近期动态</div><div class="panel-b"><div class="activity-list" id="activityFeed"></div></div></div>
 </div>
 
 <!-- CONTENT -->
 <div class="module-page" id="page-content">
-<div class="page-h"><h2>📝 内容工坊</h2></div>
+<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2></div>
 <div class="inline-form" id="form-content"></div>
 <div class="table-wrap"><table id="tbl-content"></table></div>
 </div>
 
 <!-- CUSTOMER -->
 <div class="module-page" id="page-customer">
-<div class="page-h"><h2>👤 客户中心</h2></div>
+<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2></div>
 <div class="inline-form" id="form-customer"></div>
 <div class="table-wrap"><table id="tbl-customer"></table></div>
 </div>
 
 <!-- FOLLOWUP -->
 <div class="module-page" id="page-followup">
-<div class="page-h"><h2>📋 跟进看板</h2></div>
+<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2></div>
 <div class="inline-form" id="form-followup"></div>
 <div class="table-wrap"><table id="tbl-followup"></table></div>
 </div>
 
 <!-- ORDER -->
 <div class="module-page" id="page-order">
-<div class="page-h"><h2>📦 订单管理</h2></div>
+<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2></div>
 <div class="inline-form" id="form-order"></div>
 <div class="table-wrap"><table id="tbl-order"></table></div>
 </div>
 
-<!-- FUNNEL -->
-<div class="module-page" id="page-funnel">
-<div class="page-h"><h2>📈 漏斗数据</h2></div>
-<div class="inline-form" id="form-funnel"></div>
-<div class="table-wrap"><table id="tbl-funnel"></table></div>
-</div>
-
 <!-- REPORT -->
-<div class="module-page" id="page-report">
-<div class="page-h"><h2>📄 自动报告</h2></div>
+<div class="module-page" id="page-report"><div class="page-h"><h2>📄 自动报告</h2></div>
 <div class="grid2">
 <div class="panel"><div class="panel-h">📅 今日报告 <button class="qbtn" style="font-size:11px;padding:4px 12px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
 <div class="panel"><div class="panel-h">📊 本周汇总 <button class="qbtn" style="font-size:11px;padding:4px 12px" onclick="loadReport('weekly')">刷新</button></div><div class="panel-b" id="weeklyReport"></div></div>
@@ -219,27 +226,20 @@ tr:hover td{background:#f9fbf9}
 <div class="module-page" id="page-alerts-page"><div class="page-h"><h2>🔔 提醒中心</h2></div><div id="alertsPageContent"></div></div>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-h"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-b" id="modalBody"></div><div class="modal-f"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-submit" onclick="submitModal()">保存</button></div></div></div>
 
-<!-- IDENTITY -->
 <div class="identity-modal" id="identityModal"><div class="id-card"><h3>🌿 HERBALINN</h3><div class="id-sub">输入姓名和手机号</div><input type="text" id="idName" placeholder="姓名"><input type="tel" id="idPhone" placeholder="手机号"><button onclick="saveIdentity()">开始使用</button><span class="skip" onclick="skipIdentity()">跳过</span></div></div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 var userName='',userPhone='',editId=null,editType=null;
 const toast=m=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)};
-
 function showIdentity(){document.getElementById('identityModal').classList.add('show')}
 function saveIdentity(){const n=document.getElementById('idName').value.trim(),p=document.getElementById('idPhone').value.trim();if(!n||!p){toast('请填写姓名和手机号');return};userName=n;userPhone=p;document.getElementById('identityModal').classList.remove('show');document.getElementById('identityBtn').textContent=n;document.getElementById('identityBtn').classList.add('set');localStorage.setItem('hl_user',JSON.stringify({name:n,phone:p}));toast('你好，'+n)}
 function skipIdentity(){userName='访客';document.getElementById('identityModal').classList.remove('show');document.getElementById('identityBtn').textContent='访客'}
 try{const d=JSON.parse(localStorage.getItem('hl_user'));if(d&&d.name){userName=d.name;userPhone=d.phone;document.getElementById('identityBtn').textContent=d.name;document.getElementById('identityBtn').classList.add('set')}}catch(e){}
-
-async function api(url,opts={}){
-  const h={'Content-Type':'application/json'};if(userName)h['X-User-Display']=encodeURIComponent(userName);if(userPhone)h['X-User-Phone']=userPhone;
-  const r=await fetch(url,{...opts,headers:{...h,...(opts.headers||{})}});return r.json()
-}
+async function api(url,opts={}){const h={'Content-Type':'application/json'};if(userName)h['X-User-Display']=encodeURIComponent(userName);if(userPhone)h['X-User-Phone']=userPhone;const r=await fetch(url,{...opts,headers:{...h,...(opts.headers||{})}});return r.json()}
 
 // NAV
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
@@ -248,7 +248,7 @@ document.getElementById('mainContent').addEventListener('click',()=>document.get
 function switchPage(page){
   document.querySelectorAll('.sidebar nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
   document.querySelectorAll('.module-page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
-  var m={dashboard:loadDashboard,content:()=>{loadTable('content');renderInlineForm('content')},customer:()=>{loadTable('customer');renderInlineForm('customer')},followup:()=>{loadTable('followup');renderInlineForm('followup')},order:()=>{loadTable('order');renderInlineForm('order')},funnel:()=>{loadTable('funnel');renderInlineForm('funnel')},report:()=>{loadReport('daily');loadReport('weekly')},'alerts-page':loadAlertsPage};
+  var m={dashboard:loadDashboard,content:()=>{loadTable('content');renderInlineForm('content')},customer:()=>{loadTable('customer');renderInlineForm('customer')},followup:()=>{loadTable('followup');renderInlineForm('followup')},order:()=>{loadTable('order');renderInlineForm('order')},report:()=>{loadReport('daily');loadReport('weekly')},'alerts-page':loadAlertsPage};
   if(m[page])m[page]()
 }
 
@@ -256,27 +256,56 @@ function switchPage(page){
 async function loadDashboard(){
   try{
     var s=await api('/api/stats');
-    document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="num">${s.leadCount}</div><div class="lbl">总客户</div><div class="sub">转化率 ${s.conversionRate}%</div></div><div class="stat-card"><div class="num">${s.orderCount}</div><div class="lbl">已支付订单</div><div class="sub">月卡 ${s.monthCardCount} 人</div></div><div class="stat-card"><div class="num r">${s.overdueCount}</div><div class="lbl">逾期未跟进</div></div><div class="stat-card"><div class="num o">${s.noFollowupCount}</div><div class="lbl">待首次跟进</div></div>`;
-    document.getElementById('stageBar').innerHTML=(s.stageDist||[]).map(st=>`<div class="stage-chip"><div class="sc">${st.c}</div><div class="sn">${st.stage}</div></div>`).join('')||'<div class="empty">暂无数据</div>';
-    document.getElementById('activityFeed').innerHTML=(s.recentActivity||[]).slice(0,20).map(a=>`<div class="al"><span class="al-time">${(a.created_at||'').slice(11,16)}</span><span class="al-dot"></span><span>${a.message}</span></div>`).join('')||'<div class="empty">暂无动态</div>';
+    document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="num">${s.leadCount}</div><div class="lbl">总客户</div></div><div class="stat-card"><div class="num">${s.orderCount}</div><div class="lbl">已支付订单</div></div><div class="stat-card"><div class="num r">${s.overdueCount}</div><div class="lbl">逾期未跟进</div></div><div class="stat-card"><div class="num o">${s.noFollowupCount}</div><div class="lbl">待首次跟进</div></div>`;
+    
     var alerts=await api('/api/alerts');
     if(alerts.length>0){document.getElementById('alertsRow').innerHTML=alerts.slice(0,6).map(a=>`<span class="alert-chip ${a.level}">${a.title}: ${a.detail.slice(0,35)}</span>`).join('');document.getElementById('alertBadge').textContent=alerts.length}
     else{document.getElementById('alertsRow').innerHTML='';document.getElementById('alertBadge').textContent='0'}
+    
+    document.getElementById('activityFeed').innerHTML=(s.recentActivity||[]).slice(0,20).map(a=>`<div class="al"><span class="al-time">${(a.created_at||'').slice(11,16)}</span><span class="al-dot"></span><span>${a.message}</span></div>`).join('')||'<div class="empty">暂无动态</div>';
+    
+    // Auto-funnel
+    var f=await api('/api/funnel-auto');
+    document.getElementById('funnelPanel').innerHTML=`
+      <div style="font-size:12px;color:var(--t3);margin-bottom:8px">${f.period}</div>
+      <div class="pipeline-bar">
+        <div class="pipeline-step"><div class="ps">${f.publishes}</div><div class="pl">发布内容</div></div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step"><div class="ps">${f.leads}</div><div class="pl">获取线索</div></div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step"><div class="ps">${f.diagnosed}</div><div class="pl">诊断推进</div></div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step"><div class="ps">${f.salesTalks}</div><div class="pl">跟进对话</div></div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step"><div class="ps">${f.firstOrders}</div><div class="pl">成交订单</div></div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step"><div class="ps">${f.monthlyCards}</div><div class="pl">月卡复购</div></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--t3)">
+        <span>转化率: <b style="color:var(--g2)">${f.pipeline.overallConversion}%</b></span>
+        <span>线索→跟进: <b style="color:var(--blue)">${f.pipeline.leadToPipeline}%</b></span>
+        <span>跟进→成交: <b style="color:var(--blue)">${f.pipeline.pipelineToBuy}%</b></span>
+      </div>`;
+    
+    // Top content
+    document.getElementById('topContentPanel').innerHTML=(f.topContents||[]).length?
+      (f.topContents||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px"><span>${(c.copy||c.topic_title||c.content_no||'').slice(0,28)}</span><span style="color:var(--t3)">${c.leads}线索</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无已发布内容</div>';
+    
+    // Source breakdown
+    document.getElementById('sourcePanel').innerHTML=(f.sourceBreakdown||[]).length?
+      (f.sourceBreakdown||[]).map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px"><span>${s.source_channel||'未标记'}</span><span style="color:var(--g2);font-weight:600">${s.c}人</span></div>`).join('')||'<div class="empty">暂无</div>':'<div class="empty">暂无渠道数据</div>';
   }catch(e){console.error(e)}
 }
 
-// FIELD DEFS
 var FIELD_DEFS={
 content:[{k:'content_no',l:'内容编号',t:'text',r:1,p:'CT-202608-001'},{k:'topic_no',l:'母题编号',t:'text'},{k:'topic_title',l:'母题标题',t:'text'},{k:'platform',l:'平台',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群']},{k:'format',l:'格式',t:'select',o:['','图文','短视频','长文','海报']},{k:'copy',l:'标题/文案',t:'textarea',w:1},{k:'status',l:'状态',t:'select',o:['待发布','已发布','违规','已下架']},{k:'publish_time',l:'发布时间',t:'text'},{k:'exposure',l:'曝光',t:'number'},{k:'engagement',l:'互动',t:'number'},{k:'dms',l:'私信',t:'number'},{k:'leads',l:'线索',t:'number'},{k:'violation',l:'违规',t:'text'},{k:'executor',l:'执行人',t:'text'}],
-customer:[{k:'customer_no',l:'客户编号',t:'text',r:1,p:'CU-202608-001'},{k:'name',l:'姓名',t:'text'},{k:'contact',l:'联系方式',t:'text'},{k:'city',l:'城市',t:'text'},{k:'source_channel',l:'来源',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群','转介绍','活动']},{k:'utm_tag',l:'UTM',t:'text'},{k:'source_content_no',l:'来源内容',t:'text'},{k:'need_type',l:'需求',t:'select',o:['','家庭饮水','泡茶','办公室','团购','渠道合作']},{k:'stage',l:'阶段',t:'select',o:['新线索','已诊断','待体验','体验后跟进','已购5L','月卡','流失']},{k:'tags',l:'标签',t:'text'},{k:'handler',l:'承接人',t:'text'}],
-followup:[{k:'followup_no',l:'跟进编号',t:'text',r:1,p:'FU-202608-001'},{k:'customer_no',l:'客户编号',t:'text'},{k:'followup_time',l:'跟进时间',t:'text'},{k:'method',l:'方式',t:'select',o:['','私信','微信','电话','面谈']},{k:'diagnosis',l:'诊断',t:'textarea',w:1},{k:'objection',l:'异议',t:'select',o:['','价格','信任','配送','场景','时机']},{k:'objection_detail',l:'异议详情',t:'text'},{k:'next_action',l:'下一步',t:'select',o:['','寄样品','发报价','约体验','促月卡','回访','放弃']},{k:'script_ref',l:'话术',t:'textarea',w:1},{k:'next_followup_time',l:'下次跟进',t:'text'},{k:'follower',l:'跟进人',t:'text'},{k:'result',l:'结果',t:'select',o:['','已回复','待回复','已成交','已流失']}],
-order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-202608-001'},{k:'customer_no',l:'客户编号',t:'text'},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'text'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'}],
-funnel:[{k:'week',l:'周次',t:'text',r:1,p:'W1'},{k:'date_range',l:'日期',t:'text'},{k:'publishes',l:'发布',t:'number'},{k:'leads',l:'线索',t:'number'},{k:'diagnosed',l:'诊断',t:'number'},{k:'sales_talks',l:'对话',t:'number'},{k:'first_orders',l:'首单',t:'number'},{k:'monthly_cards',l:'月卡',t:'number'},{k:'rebuys',l:'复购',t:'number'},{k:'lead_to_diag_rate',l:'诊断率',t:'number'},{k:'diag_to_pay_rate',l:'付费率',t:'number'},{k:'pay_to_card_rate',l:'月卡率',t:'number'},{k:'cac',l:'获客成本',t:'number'},{k:'auto_save_hours',l:'省时h',t:'number'},{k:'auto_error_rate',l:'错误率',t:'number'},{k:'status',l:'状态',t:'select',o:['绿','黄','红']}]
+customer:[{k:'customer_no',l:'客户编号',t:'text',r:1,p:'CU-202608-001'},{k:'name',l:'姓名',t:'text'},{k:'contact',l:'联系方式',t:'text'},{k:'city',l:'城市',t:'text'},{k:'source_channel',l:'来源',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群','转介绍','活动']},{k:'source_content_no',l:'来源内容编号',t:'text'},{k:'need_type',l:'需求',t:'select',o:['','家庭饮水','泡茶','办公室','团购','渠道合作']},{k:'stage',l:'阶段',t:'select',o:['新线索','已诊断','待体验','体验后跟进','已购5L','月卡','流失']},{k:'tags',l:'标签',t:'text'},{k:'handler',l:'承接人',t:'text'}],
+followup:[{k:'followup_no',l:'跟进编号',t:'text',r:1,p:'FU-202608-001'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'followup_time',l:'跟进时间',t:'text'},{k:'method',l:'方式',t:'select',o:['','私信','微信','电话','面谈']},{k:'diagnosis',l:'诊断',t:'textarea',w:1},{k:'objection',l:'异议',t:'select',o:['','价格','信任','配送','场景','时机']},{k:'objection_detail',l:'异议详情',t:'text'},{k:'next_action',l:'下一步',t:'select',o:['','寄样品','发报价','约体验','促月卡','回访','放弃']},{k:'script_ref',l:'话术',t:'textarea',w:1},{k:'next_followup_time',l:'下次跟进',t:'text'},{k:'follower',l:'跟进人',t:'text'},{k:'result',l:'结果',t:'select',o:['','已回复','待回复','已成交','已流失']}],
+order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-202608-001'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'text'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'}]
 };
 
-// INLINE FORM
 function renderInlineForm(type){
-  var fd=FIELD_DEFS[type],el=document.getElementById('form-'+type),html='<h3>新增'+{content:'内容',customer:'客户',followup:'跟进',order:'订单',funnel:'漏斗'}[type]+'</h3><div class="form-row">';
+  var fd=FIELD_DEFS[type],el=document.getElementById('form-'+type),html='<h3>新增'+{content:'内容',customer:'客户',followup:'跟进',order:'订单'}[type]+'</h3><div class="form-row">';
   fd.forEach(f=>{html+=`<div class="fg${f.w?'':''}"><label>${f.l}${f.r?' <span class="r">*</span>':''}</label>`;
     if(f.t==='select')html+=`<select id="if-${f.k}">${(f.o||[]).map(o=>`<option value="${o}">${o||'--'}</option>`).join('')}</select>`;
     else if(f.t==='textarea')html+=`<textarea id="if-${f.k}" rows="2" placeholder="${f.p||''}"></textarea>`;
@@ -289,16 +318,15 @@ async function submitInline(type){
   var data={},valid=true;
   FIELD_DEFS[type].forEach(f=>{var el=document.getElementById('if-'+f.k);if(!el)return;var v=el.value;if(f.t==='number'&&v!=='')v=Number(v);data[f.k]=v;if(f.r&&!v){valid=false;el.style.borderColor='var(--red)'}});
   if(!valid){toast('请填写必填字段');return}
-  var r=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':type==='order'?'orders':'funnels'),{method:'POST',body:JSON.stringify(data)});
+  var r=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'),{method:'POST',body:JSON.stringify(data)});
   r.ok?(resetInline(type),loadTable(type),loadDashboard(),toast('添加成功')):toast(r.error||'失败')
 }
 function resetInline(type){FIELD_DEFS[type].forEach(f=>{var el=document.getElementById('if-'+f.k);if(el)el.value=''});loadTable(type);loadDashboard()}
 
-// TABLE
 async function loadTable(type){
   var tbl=document.getElementById('tbl-'+type);
   try{
-    var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':type==='order'?'orders':'funnels'));
+    var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'));
     if(!data.length){tbl.innerHTML='<tr><td colspan="99" class="empty">暂无数据</td></tr>';return}
     var fd=FIELD_DEFS[type],html='<thead><tr>'+fd.map(f=>`<th>${f.l}</th>`).join('')+'<th></th></tr></thead><tbody>';
     data.forEach(row=>{html+='<tr>'+fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';if(f.k==='status')return`<td>${v==='绿'?'<span class="tag tag-g">绿</span>':v==='黄'?'<span class="tag tag-y">黄</span>':v==='红'?'<span class="tag tag-r">红</span>':v}</td>`;if(f.k==='stage')return`<td><span class="tag tag-b">${v}</span></td>`;if(f.k==='pay_status')return`<td>${v==='已支付'?'<span class="tag tag-g">'+v+'</span>':v}</td>`;var sv=typeof v==='string'&&v.length>30?v.slice(0,28)+'..':v;return`<td>${sv}</td>`}).join('')+`<td><div class="btns"><button class="edt" onclick="editRow('${type}',${row.id})">编辑</button><button class="del" onclick="deleteRow('${type}',${row.id})">删除</button></div></td></tr>`});
@@ -306,18 +334,12 @@ async function loadTable(type){
   }catch(e){tbl.innerHTML='<tr><td colspan="99" style="padding:40px;color:#e74c3c;text-align:center">加载失败</td></tr>'}
 }
 
-// MODAL (edit)
 function openModal(type,row){editType=type;editId=row.id;document.getElementById('modalTitle').textContent='编辑';var fd=FIELD_DEFS[type],html='<div class="form-grid">';fd.forEach(f=>{html+=`<div class="fg${f.w?' full':''}"><label>${f.l}</label>`;if(f.t==='select')html+=`<select name="${f.k}">${(f.o||[]).map(o=>`<option value="${o}">${o||'--'}</option>`).join('')}</select>`;else if(f.t==='textarea')html+=`<textarea name="${f.k}" rows="3">${row[f.k]||''}</textarea>`;else html+=`<input type="${f.t}" name="${f.k}" value="${row[f.k]||''}">`;html+='</div>'});document.getElementById('modalBody').innerHTML=html+'</div>';document.getElementById('modalOverlay').classList.add('show');fd.forEach(f=>{var el=document.querySelector(`[name="${f.k}"]`);if(el&&row[f.k]!==undefined)el.value=row[f.k]})}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');editId=null;editType=null}
-async function submitModal(){
-  var data={};FIELD_DEFS[editType].forEach(f=>{var el=document.querySelector(`[name="${f.k}"]`);if(!el)return;var v=el.value;if(f.t==='number'&&v!=='')v=Number(v);data[f.k]=v});
-  var r=await api(`/api/${editType}s/${editId}`,{method:'PUT',body:JSON.stringify(data)});
-  r.ok?(closeModal(),loadTable(editType),loadDashboard(),toast('更新成功')):toast(r.error||'失败')
-}
+async function submitModal(){var data={};FIELD_DEFS[editType].forEach(f=>{var el=document.querySelector(`[name="${f.k}"]`);if(!el)return;var v=el.value;if(f.t==='number'&&v!=='')v=Number(v);data[f.k]=v});var r=await api(`/api/${editType}s/${editId}`,{method:'PUT',body:JSON.stringify(data)});r.ok?(closeModal(),loadTable(editType),loadDashboard(),toast('更新成功')):toast(r.error||'失败')}
 async function editRow(type,id){var d=await api(`/api/${type}s`);var r=d.find(x=>x.id===id);if(r)openModal(type,r)}
 async function deleteRow(type,id){if(!confirm('确认删除？'))return;var r=await api(`/api/${type}s/${id}`,{method:'DELETE'});r.ok?(loadTable(type),loadDashboard(),toast('已删除')):toast(r.error||'失败')}
 
-// REPORT
 async function loadReport(type){
   var r=await api(`/api/report/${type}`);
   var items=[{v:r.publishes,l:'发布'},{v:r.newLeads,l:'新线索'},{v:r.diagnosed,l:'推进'},{v:r.talks,l:'对话'},{v:r.orders,l:'成交'},{v:r.monthlyCards,l:'月卡'}];

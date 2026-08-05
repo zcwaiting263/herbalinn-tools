@@ -340,6 +340,39 @@ initDB().then(() => {
     res.json({passed:hits.length===0,hits,message:hits.length>0?`发现${hits.length}个禁用词: ${hits.join('、')}`:'内容合规',suggestion:hits.length>0?'请替换或删除禁用词':'通过'});
   });
 
+  // Auto-funnel (real-time from all tables)
+  app.get('/api/funnel-auto',(req,res)=>{
+    const today = new Date().toISOString().slice(0,10);
+    const weekStart = new Date(Date.now()-7*86400000).toISOString().slice(0,10);
+    const d60 = new Date(Date.now()-60*86400000).toISOString().slice(0,10);
+    
+    const publishes = dbGet(`SELECT COUNT(*) as c FROM contents WHERE publish_time>=? AND status='已发布'`,[d60])?.c||0;
+    const leads = dbGet(`SELECT COUNT(*) as c FROM customers WHERE created_at>=?`,[d60])?.c||0;
+    const diagnosed = dbGet(`SELECT COUNT(*) as c FROM customers WHERE stage NOT IN ('新线索','流失') AND updated_at>=?`,[d60])?.c||0;
+    const salesTalks = dbGet(`SELECT COUNT(*) as c FROM followups WHERE followup_time>=?`,[d60])?.c||0;
+    const firstOrders = dbGet(`SELECT COUNT(*) as c FROM orders WHERE created_at>=? AND pay_status='已支付'`,[d60])?.c||0;
+    const monthlyCards = dbGet(`SELECT COUNT(*) as c FROM orders WHERE created_at>=? AND product_type='月卡' AND pay_status='已支付'`,[d60])?.c||0;
+    
+    const topContents = dbAll(`SELECT content_no,topic_title,platform,leads,engagement FROM contents WHERE leads>0 ORDER BY leads DESC LIMIT 8`);
+    const sourceBreakdown = dbAll(`SELECT source_channel,COUNT(*) as c FROM customers WHERE source_channel IS NOT NULL AND source_channel!='' GROUP BY source_channel ORDER BY c DESC`);
+    
+    const newLeads = dbGet(`SELECT COUNT(*) as c FROM customers WHERE stage='新线索'`)?.c||0;
+    const inPipeline = dbGet(`SELECT COUNT(*) as c FROM customers WHERE stage IN ('已诊断','待体验','体验后跟进')`)?.c||0;
+    const bought = dbGet(`SELECT COUNT(*) as c FROM customers WHERE stage IN ('已购5L','月卡')`)?.c||0;
+    const total = dbGet(`SELECT COUNT(*) as c FROM customers`)?.c||0;
+    
+    res.json({
+      period: `近60天 (${d60} ~ ${today})`,
+      publishes, leads, diagnosed, salesTalks, firstOrders, monthlyCards,
+      topContents, sourceBreakdown,
+      pipeline: { newLeads, inPipeline, bought, total,
+        leadToPipeline: newLeads>0?((inPipeline+bought)/newLeads*100).toFixed(1):0,
+        pipelineToBuy: (inPipeline+bought)>0?(bought/(inPipeline+bought)*100).toFixed(1):0,
+        overallConversion: total>0?(bought/total*100).toFixed(1):0
+      }
+    });
+  });
+
   // Stats
   app.get('/api/stats',(req,res)=>{
     const today=new Date().toISOString().slice(0,10);
