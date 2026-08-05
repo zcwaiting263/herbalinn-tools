@@ -97,11 +97,12 @@ async function logActivity(type, message, relatedId, user) {
   await client.execute({sql:'INSERT INTO activity_log (type,message,related_id,created_by,created_at) VALUES (?,?,?,?,?)',args:[type,message,String(relatedId||''),user||'system',now]});
 }
 
+const PFX={content:'CT',customer:'CU',followup:'FU',order:'OR'};
 function generateNo(prefix, seq) {
-  const now = new Date();
-  const ts = now.toISOString().slice(0,10).replace(/-/g,'').slice(2);
-  return `${prefix.toUpperCase()}-${ts}-${String(seq+1).padStart(3,'0')}`;
+  const now = new Date();const ts=now.toISOString().slice(0,10).replace(/-/g,'').slice(2);
+  return `${PFX[prefix]||prefix.toUpperCase().slice(0,2)}-${ts}-${String(seq+1).padStart(3,'0')}`;
 }
+
 
 async function getCols(table) {
   const r = await client.execute(`PRAGMA table_info(${table})`);
@@ -154,7 +155,7 @@ initDB().then(() => {
       
       if (!req.body[noKey]) {
         const cnt = (await client.execute(`SELECT COUNT(*) as c FROM ${t} WHERE ${noKey} LIKE '${singular.toUpperCase()}-%'`)).rows[0].c;
-        req.body[noKey] = generateNo(singular, cnt);
+        req.body[noKey] = generateNo(singular, seq);
       }
       
       const allCols = [...cols];
