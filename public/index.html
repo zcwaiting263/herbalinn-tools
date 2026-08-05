@@ -189,28 +189,28 @@ tr:hover td{background:#f9fbf9}
 
 <!-- CONTENT -->
 <div class="module-page" id="page-content">
-<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2></div>
+<div class="page-h"><h2>📝 内容工坊 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">→ 产生线索进入客户中心</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('content')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-content"></div>
 <div class="table-wrap"><table id="tbl-content"></table></div>
 </div>
 
 <!-- CUSTOMER -->
 <div class="module-page" id="page-customer">
-<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2></div>
+<div class="page-h"><h2>👤 客户中心 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 来自内容 / → 进入跟进/订单</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('customer')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-customer"></div>
 <div class="table-wrap"><table id="tbl-customer"></table></div>
 </div>
 
 <!-- FOLLOWUP -->
 <div class="module-page" id="page-followup">
-<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2></div>
+<div class="page-h"><h2>📋 跟进看板 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 绑定客户编号 / → 成交生成订单</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('followup')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-followup"></div>
 <div class="table-wrap"><table id="tbl-followup"></table></div>
 </div>
 
 <!-- ORDER -->
 <div class="module-page" id="page-order">
-<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2></div>
+<div class="page-h"><h2>📦 订单管理 &nbsp;<span style="font-size:12px;color:var(--t3);font-weight:400">← 关联客户编号 / 支付→自动升级客户阶段</span></h2><button class="qbtn" style="font-size:11px;padding:5px 14px" onclick="exportCSV('order')">📥 导出Excel</button></div>
 <div class="inline-form" id="form-order"></div>
 <div class="table-wrap"><table id="tbl-order"></table></div>
 </div>
@@ -348,6 +348,19 @@ async function loadReport(type){
 async function loadAlertsPage(){
   var alerts=await api('/api/alerts');
   document.getElementById('alertsPageContent').innerHTML=alerts.length?alerts.map(a=>`<div class="panel" style="margin-bottom:8px;border-left:3px solid ${a.level==='danger'?'var(--red)':a.level==='warning'?'var(--orange)':'var(--blue)'}"><div class="panel-h">${a.title} <span style="font-size:12px;font-weight:400;color:var(--t3)">${a.level==='danger'?'紧急':'一般'}</span></div><div class="panel-b" style="font-size:13px">${a.detail}</div></div>`).join(''):'<div class="panel"><div class="panel-b empty">✅ 暂无待处理提醒</div></div>'
+}
+
+async function exportCSV(type){
+  var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'));
+  if(!data.length){toast('暂无数据可导出');return}
+  var fd=FIELD_DEFS[type],lbl={content:'内容',customer:'客户',followup:'跟进',order:'订单'};
+  var csv='\uFEFF'+fd.map(f=>f.l).join(',')+'\n';
+  data.forEach(row=>{
+    csv+=fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';v=String(v).replace(/"/g,'""');return '"'+v+'"'}).join(',')+'\n';
+  });
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HERBALINN_'+lbl[type]+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  toast('已导出 '+data.length+' 条');
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
