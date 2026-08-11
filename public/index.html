@@ -276,7 +276,7 @@ document.getElementById('mainContent').addEventListener('click',()=>document.get
 function switchPage(page){
   document.querySelectorAll('.sidebar nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
   document.querySelectorAll('.module-page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
-  var m={dashboard:loadDashboard,content:()=>{loadTable('content');renderInlineForm('content')},customer:()=>{loadTable('customer');renderInlineForm('customer')},followup:()=>{loadTable('followup');renderInlineForm('followup')},order:()=>{loadTable('order');renderInlineForm('order')},report:()=>{loadReport('daily');loadReport('weekly')},'alerts-page':loadAlertsPage};
+  var m={dashboard:loadDashboard,content:()=>{loadTable('content');renderInlineForm('content')},customer:()=>{loadTable('customer');renderInlineForm('customer')},followup:()=>{loadTable('followup');renderInlineForm('followup')},order:()=>{loadTable('order');renderInlineForm('order')},report:()=>{loadReport('daily');loadReport('weekly')},'alerts-page':loadAlertsPage,platform:()=>{loadTable('platform');renderInlineForm('platform')}};
   if(m[page])m[page]()
 }
 
