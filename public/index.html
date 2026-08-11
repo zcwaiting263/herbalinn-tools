@@ -326,7 +326,7 @@ var FIELD_DEFS={
 content:[{k:'content_no',l:'内容编号',t:'text',r:1,p:'CT-0501'},{k:'topic_title',l:'主题',t:'text'},{k:'platform',l:'平台',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群']},{k:'format',l:'格式',t:'select',o:['','图文','短视频','长文','海报']},{k:'copy',l:'标题/文案',t:'textarea',w:1},{k:'status',l:'状态',t:'select',o:['待发布','已发布','违规','已下架']},{k:'publish_time',l:'发布时间',t:'datetime-local'},{k:'exposure',l:'曝光',t:'number'},{k:'engagement',l:'互动',t:'number'},{k:'dms',l:'私信',t:'number'},{k:'leads',l:'线索',t:'number'},{k:'violation',l:'违规',t:'text'},{k:'channel_level',l:'渠道等级',t:'select',o:['','S级','A级','B级']},{k:'info_gap',l:'资料缺口',t:'textarea',w:1},{k:'executor',l:'执行人',t:'text'}],
 customer:[{k:'customer_no',l:'客户编号',t:'text',p:'CU-0501'},{k:'name',l:'姓名',t:'text',r:1},{k:'contact',l:'联系方式',t:'text'},{k:'city',l:'城市',t:'text'},{k:'source_channel',l:'来源',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群','转介绍','活动']},{k:'source_content_no',l:'来源内容编号',t:'text'},{k:'need_type',l:'需求',t:'text'},{k:'stage',l:'阶段',t:'select',o:['新线索','已诊断','待体验','体验后跟进','已购5L','月卡','流失']},{k:'handler',l:'承接人',t:'text'}],
 followup:[{k:'followup_no',l:'跟进编号',t:'text',r:1,p:'FU-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'followup_time',l:'跟进时间',t:'datetime-local'},{k:'method',l:'方式',t:'select',o:['','私信','微信','电话','面谈']},{k:'diagnosis',l:'诊断',t:'textarea',w:1},{k:'objection',l:'异议',t:'select',o:['','价格','信任','配送','场景','时机']},{k:'objection_detail',l:'异议详情',t:'text'},{k:'next_action',l:'下一步',t:'select',o:['','寄样品','发报价','约体验','促月卡','回访','放弃']},{k:'script_ref',l:'话术',t:'textarea',w:1},{k:'next_followup_time',l:'下次跟进',t:'datetime-local'},{k:'follower',l:'跟进人',t:'text'},{k:'result',l:'结果',t:'select',o:['','已回复','待回复','已成交','已流失']}],
-platform:[{k:'platform_no',l:'平台编号',t:'text',r:1},{k:'name',l:'平台名称',t:'text',r:1},{k:'platform_type',l:'类型',t:'select',o:['','海外直邮','跨境保税']},{k:'channel_level',l:'渠道等级',t:'select',o:['','S级','A级','B级']},{k:'progress',l:'入驻进度',t:'select',o:['待跟进','申请中','已入驻','已放弃']},{k:'handler',l:'负责人',t:'text'},{k:'official_url',l:'官方来源',t:'text'},{k:'info_gap',l:'资料缺口',t:'textarea',w:1},{k:'next_action',l:'下一步动作',t:'text'},{k:'deadline',l:'截止时间',t:'datetime-local'}],order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'datetime-local'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'},{k:'order_handler',l:'订单负责人',t:'text'}]
+platform:[{k:'platform_no',l:'平台编号',t:'text',r:1},{k:'name',l:'平台名称',t:'select',o:['','拼多多国际','抖音电商全球购','唯品国际','天猫国际','京东国际','小红书跨境'],r:1},{k:'platform_type',l:'类型',t:'select',o:['','海外直邮','跨境保税']},{k:'channel_level',l:'渠道等级',t:'select',o:['','S级','A级','B级']},{k:'progress',l:'入驻进度',t:'select',o:['待跟进','申请中','已入驻','已放弃']},{k:'handler',l:'负责人',t:'text'},{k:'official_url',l:'官方来源',t:'text'},{k:'info_gap',l:'资料缺口',t:'textarea',w:1},{k:'next_action',l:'下一步动作',t:'text'},{k:'deadline',l:'截止时间',t:'datetime-local'}],order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'datetime-local'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'},{k:'order_handler',l:'订单负责人',t:'text'}]
 };
 
 function renderInlineForm(type){
@@ -412,6 +412,29 @@ async function updateDataCount(){
   if(d._recordCount>0)el.textContent='当前存储 '+d._recordCount+' 条数据 &middot; 更新前请先备份';
 }
 loadDashboard();
+
+// Platform auto-fill
+var PLATFORM_DATA={
+  '拼多多国际':{no:'O-001',url:'https://kuajing.pinduoduo.com',level:'S级',handler:'小廖',gap:'需提交品牌授权书和质检报告'},
+  '抖音电商全球购':{no:'O-002',url:'https://haohuo.jinritemai.com',level:'S级',handler:'小廖',gap:'需对接招商经理获取入驻标准'},
+  '唯品国际':{no:'O-003',url:'https://vip.com',level:'A级',handler:'小静',gap:'海外仓合作细则缺失'},
+  '天猫国际':{no:'O-004',url:'https://tmall.hk',level:'S级',handler:'小廖',gap:'品牌授权流程不清晰'},
+  '京东国际':{no:'O-005',url:'https://jd.hk',level:'S级',handler:'小静',gap:'跨境物流合作方信息缺失'},
+  '小红书跨境':{no:'O-006',url:'https://xiaohongshu.com',level:'A级',handler:'小静',gap:'店铺入驻政策待确认'}
+};
+document.addEventListener('DOMContentLoaded',function(){
+  var sel=document.getElementById('if-name');
+  if(sel)sel.addEventListener('change',function(){
+    var d=PLATFORM_DATA[this.value];
+    if(d){
+      document.getElementById('if-platform_no').value=d.no;
+      document.getElementById('if-channel_level').value=d.level;
+      document.getElementById('if-handler').value=d.handler;
+      document.getElementById('if-info_gap').value=d.gap;
+      document.getElementById('if-official_url').value=d.url;
+    }
+  });
+});
 </script>
 </body>
 </html>
