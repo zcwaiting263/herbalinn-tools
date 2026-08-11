@@ -274,7 +274,7 @@ initDB().then(() => {
     const leadCount = (await client.execute(`SELECT COUNT(*) as c FROM customers`)).rows[0].c;
     const orderCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE pay_status='已支付'`)).rows[0].c;
     const monthCardCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE product_type='月卡' AND pay_status='已支付'`)).rows[0].c;
-    const overdueCount = (await client.execute((`SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time<?`,args:[today])).rows[0].c;
+const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time < '" + today + "'")).rows[0].c;
     const noFollowupCount = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage='新线索' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)`)).rows[0].c;
     const stageDist = (await client.execute(`SELECT stage,COUNT(*) as c FROM customers GROUP BY stage`)).rows;
     const converted = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage IN ('已购5L','月卡')`)).rows[0].c;
@@ -314,21 +314,6 @@ initDB().then(() => {
   });
 
   app.listen(PORT, () => console.log(`HERBALINN on port ${PORT}, Turso: ${TURSO_URL}`));
-});app.get('/api/alerts', async (req,res) => {
-    const alerts = []; const today = new Date().toISOString().slice(0,10);
-    const d3 = new Date(Date.now()-3*86400000).toISOString().slice(0,10);
-    try {
-      const q1 = "SELECT f.*,COALESCE(c.name,f.customer_no) as cn FROM followups f LEFT JOIN customers c ON f.customer_no=c.customer_no WHERE f.result NOT IN ('已成交','已流失') AND f.next_followup_time IS NOT NULL AND f.next_followup_time < '" + today + "'";
-      const overdueFUs = (await client.execute(q1)).rows;
-      (overdueFUs||[]).forEach(f=>alerts.push({type:'overdue',level:'danger',title:'逾期未跟进',detail:f.cn + ' 上次' + (f.followup_time||'') + '，下次' + (f.next_followup_time||''),relatedId:f.id}));
-    } catch(e) {}
-    try {
-      const q2 = "SELECT * FROM customers WHERE stage='新线索' AND created_at < '" + d3 + "' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)";
-      const noFU3 = (await client.execute(q2)).rows;
-      (noFU3||[]).forEach(c=>alerts.push({type:'no_followup',level:'warning',title:'超3天未跟进',detail:(c.name||c.customer_no) + ' ' + ((c.created_at||'').slice(0,10)) + '入库，尚未首次跟进',relatedId:c.id}));
-    } catch(e) {}
-    res.json(alerts);
-  });    
     app.get(`/api/${t}/:id`, async (req,res) => {
       const r = await client.execute({sql:`SELECT * FROM ${t} WHERE id=?`,args:[req.params.id]});
       r.rows[0] ? res.json(r.rows[0]) : res.status(404).json({error:'未找到'});
@@ -461,7 +446,7 @@ initDB().then(() => {
     const leadCount = (await client.execute(`SELECT COUNT(*) as c FROM customers`)).rows[0].c;
     const orderCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE pay_status='已支付'`)).rows[0].c;
     const monthCardCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE product_type='月卡' AND pay_status='已支付'`)).rows[0].c;
-    const overdueCount = (await client.execute((`SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time<?`,args:[today])).rows[0].c;
+const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time < '" + today + "'")).rows[0].c;
     const noFollowupCount = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage='新线索' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)`)).rows[0].c;
     const stageDist = (await client.execute(`SELECT stage,COUNT(*) as c FROM customers GROUP BY stage`)).rows;
     const converted = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage IN ('已购5L','月卡')`)).rows[0].c;
@@ -501,4 +486,3 @@ initDB().then(() => {
   });
 
   app.listen(PORT, () => console.log(`HERBALINN on port ${PORT}, Turso: ${TURSO_URL}`));
-});
