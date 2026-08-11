@@ -44,6 +44,20 @@ async function initDB() {
     next_followup_time TEXT, follower TEXT, result TEXT,
     created_at TEXT
   )`);
+  await client.execute(`CREATE TABLE IF NOT EXISTS platforms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    platform_no TEXT UNIQUE NOT NULL,
+    name TEXT,
+    platform_type TEXT DEFAULT '海外直邮',
+    channel_level TEXT,
+    progress TEXT DEFAULT '待跟进',
+    handler TEXT,
+    official_url TEXT,
+    info_gap TEXT,
+    next_action TEXT,
+    deadline TEXT,
+    created_at TEXT
+  )`);
   await client.execute(`CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_no TEXT UNIQUE NOT NULL, customer_no TEXT,
