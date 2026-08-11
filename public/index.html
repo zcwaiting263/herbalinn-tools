@@ -181,6 +181,7 @@ tr:hover td{background:#f2f6f2}
 <a href="#" data-page="customer"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>客户中心</a>
 <a href="#" data-page="followup"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>跟进看板</a>
 <a href="#" data-page="order"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 23 8 20 12 22 16 16 12 16 8"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="18" r="2"/></svg></span>订单管理</a>
+<a href="#" data-page="platform"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>平台入驻</a>
 <div class="s-section">分析</div>
 <a href="#" data-page="report"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>自动报告</a>
 <a href="#" data-page="alerts-page"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>提醒中心 <span class="badge" id="alertBadge">0</span></a>
@@ -245,6 +246,7 @@ tr:hover td{background:#f2f6f2}
 <div class="table-wrap"><table id="tbl-order"></table></div>
 </div>
 
+<div class="module-page" id="page-platform"><div class="page-h"><h2>平台入驻 <span class="arrow-hint">海外直邮渠道申请进度</span></h2><button class="export-btn" onclick="exportCSV('platform')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button></div><div id="form-platform"></div><div class="table-wrap"><table id="tbl-platform"></table></div></div>
 <div class="module-page" id="page-report"><div class="page-h"><h2>自动报告</h2></div>
 <div class="grid2">
 <div class="panel"><div class="panel-h">今日报告<button class="qbtn" style="font-size:12px;padding:5px 14px" onclick="loadReport('daily')">刷新</button></div><div class="panel-b" id="dailyReport"></div></div>
@@ -324,7 +326,7 @@ var FIELD_DEFS={
 content:[{k:'content_no',l:'内容编号',t:'text',r:1,p:'CT-0501'},{k:'topic_title',l:'主题',t:'text'},{k:'platform',l:'平台',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群']},{k:'format',l:'格式',t:'select',o:['','图文','短视频','长文','海报']},{k:'copy',l:'标题/文案',t:'textarea',w:1},{k:'status',l:'状态',t:'select',o:['待发布','已发布','违规','已下架']},{k:'publish_time',l:'发布时间',t:'datetime-local'},{k:'exposure',l:'曝光',t:'number'},{k:'engagement',l:'互动',t:'number'},{k:'dms',l:'私信',t:'number'},{k:'leads',l:'线索',t:'number'},{k:'violation',l:'违规',t:'text'},{k:'channel_level',l:'渠道等级',t:'select',o:['','S级','A级','B级']},{k:'info_gap',l:'资料缺口',t:'textarea',w:1},{k:'executor',l:'执行人',t:'text'}],
 customer:[{k:'customer_no',l:'客户编号',t:'text',p:'CU-0501'},{k:'name',l:'姓名',t:'text',r:1},{k:'contact',l:'联系方式',t:'text'},{k:'city',l:'城市',t:'text'},{k:'source_channel',l:'来源',t:'select',o:['','视频号','抖音','小红书','朋友圈','社群','转介绍','活动']},{k:'source_content_no',l:'来源内容编号',t:'text'},{k:'need_type',l:'需求',t:'text'},{k:'stage',l:'阶段',t:'select',o:['新线索','已诊断','待体验','体验后跟进','已购5L','月卡','流失']},{k:'handler',l:'承接人',t:'text'}],
 followup:[{k:'followup_no',l:'跟进编号',t:'text',r:1,p:'FU-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'followup_time',l:'跟进时间',t:'datetime-local'},{k:'method',l:'方式',t:'select',o:['','私信','微信','电话','面谈']},{k:'diagnosis',l:'诊断',t:'textarea',w:1},{k:'objection',l:'异议',t:'select',o:['','价格','信任','配送','场景','时机']},{k:'objection_detail',l:'异议详情',t:'text'},{k:'next_action',l:'下一步',t:'select',o:['','寄样品','发报价','约体验','促月卡','回访','放弃']},{k:'script_ref',l:'话术',t:'textarea',w:1},{k:'next_followup_time',l:'下次跟进',t:'datetime-local'},{k:'follower',l:'跟进人',t:'text'},{k:'result',l:'结果',t:'select',o:['','已回复','待回复','已成交','已流失']}],
-order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'datetime-local'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'},{k:'order_handler',l:'订单负责人',t:'text'}]
+platform:[{k:'platform_no',l:'平台编号',t:'text',r:1},{k:'name',l:'平台名称',t:'text',r:1},{k:'platform_type',l:'类型',t:'select',o:['','海外直邮','跨境保税']},{k:'channel_level',l:'渠道等级',t:'select',o:['','S级','A级','B级']},{k:'progress',l:'入驻进度',t:'select',o:['待跟进','申请中','已入驻','已放弃']},{k:'handler',l:'负责人',t:'text'},{k:'official_url',l:'官方来源',t:'text'},{k:'info_gap',l:'资料缺口',t:'textarea',w:1},{k:'next_action',l:'下一步动作',t:'text'},{k:'deadline',l:'截止时间',t:'datetime-local'}],order:[{k:'order_no',l:'订单编号',t:'text',r:1,p:'OR-0501'},{k:'customer_no',l:'客户编号',t:'text',r:1},{k:'product_type',l:'产品',t:'select',o:['','330ml体验装','5L首单','月卡','续费']},{k:'quantity',l:'数量',t:'number'},{k:'amount',l:'金额',t:'number'},{k:'pay_status',l:'支付',t:'select',o:['待支付','已支付','已退款']},{k:'pay_time',l:'支付时间',t:'datetime-local'},{k:'delivery_status',l:'配送',t:'select',o:['待发货','已发货','已签收','退回']},{k:'rebuy_count',l:'复购',t:'number'},{k:'order_handler',l:'订单负责人',t:'text'}]
 };
 
 function renderInlineForm(type){
@@ -341,7 +343,7 @@ async function submitInline(type){
   var data={},valid=true;
   FIELD_DEFS[type].forEach(f=>{var el=document.getElementById('if-'+f.k);if(!el)return;var v=el.value;if(f.t==='number'&&v!=='')v=Number(v);data[f.k]=v;if(f.r&&!v){valid=false;el.style.borderColor='var(--red)'}});
   if(!valid){toast('请填写必填字段');return}
-  var r=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'),{method:'POST',body:JSON.stringify(data)});
+  var r=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':type==='platform'?'platforms':'orders'),{method:'POST',body:JSON.stringify(data)});
   r.ok?(resetInline(type),loadTable(type),loadDashboard(),toast('添加成功')):toast(r.error||'失败')
 }
 function resetInline(type){FIELD_DEFS[type].forEach(f=>{var el=document.getElementById('if-'+f.k);if(el)el.value=''});loadTable(type);loadDashboard()}
@@ -349,7 +351,7 @@ function resetInline(type){FIELD_DEFS[type].forEach(f=>{var el=document.getEleme
 async function loadTable(type){
   var tbl=document.getElementById('tbl-'+type);
   try{
-    var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'));
+    var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':type==='platform'?'platforms':'orders'));
     if(!data.length){tbl.innerHTML='<tr><td colspan="99" class="empty">暂无数据</td></tr>';return}
     var fd=FIELD_DEFS[type],html='<thead><tr>'+fd.map(f=>`<th>${f.l}</th>`).join('')+'<th></th></tr></thead><tbody>';
     data.forEach(row=>{html+='<tr>'+fd.map(f=>{var v=row[f.k];if(v===null||v===undefined)v='';if(f.k==='status')return`<td>${v==='绿'?'<span class="tag tag-g">绿</span>':v==='黄'?'<span class="tag tag-y">黄</span>':v==='红'?'<span class="tag tag-r">红</span>':v}</td>`;if(f.k==='stage')return`<td><span class="tag tag-b">${v}</span></td>`;if(f.k==='pay_status')return`<td>${v==='已支付'?'<span class="tag tag-g">'+v+'</span>':v}</td>`;var sv=typeof v==='string'&&v.length>30?v.slice(0,28)+'..':v;return`<td>${sv}</td>`}).join('')+`<td><div class="btns"><button class="edt" onclick="editRow('${type}',${row.id})">编辑</button><button class="del" onclick="deleteRow('${type}',${row.id})">删除</button></div></td></tr>`});
@@ -374,7 +376,7 @@ async function loadAlertsPage(){
 }
 
 async function exportCSV(type){
-  var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':'orders'));
+  var data=await api('/api/'+(type==='content'?'contents':type==='customer'?'customers':type==='followup'?'followups':type==='platform'?'platforms':'orders'));
   if(!data.length){toast('暂无数据可导出');return}
   var fd=FIELD_DEFS[type],lbl={content:'内容',customer:'客户',followup:'跟进',order:'订单'};
   var csv='\uFEFF'+fd.map(f=>f.l).join(',')+'\n';
