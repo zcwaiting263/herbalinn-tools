@@ -286,11 +286,11 @@ initDB().then(() => {
   app.get('/api/alerts', async (req,res) => {
     const alerts = []; const today = new Date().toISOString().slice(0,10);
     const overdueFUs = (await client.execute({sql:`SELECT f.*,COALESCE(c.name,f.customer_no) as cn FROM followups f LEFT JOIN customers c ON f.customer_no=c.customer_no WHERE f.result NOT IN ('已成交','已流失') AND f.next_followup_time IS NOT NULL AND f.next_followup_time < ?`})).rows;
-    overdueFUs.forEach(f=>alerts.push({type:'overdue',level:'danger',title:'逾期未跟进',detail:`${f.cn} 上次${f.followup_time}，下次${f.next_followup_time}`,relatedId:f.id}));
+    (overdueFUs||[]).forEach(f=>alerts.push({type:'overdue',level:'danger',title:'逾期未跟进',detail:`${f.cn} 上次${f.followup_time}，下次${f.next_followup_time}`,relatedId:f.id}));
     
     const d3=new Date(Date.now()-3*86400000).toISOString().slice(0,10);
     const noFU3 = (await client.execute({sql:`SELECT * FROM customers WHERE stage='新线索' AND created_at < ? AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)`})).rows;
-    noFU3.forEach(c=>alerts.push({type:'no_followup',level:'warning',title:'超3天未跟进',detail:`${c.name||c.customer_no} ${(c.created_at||'').slice(0,10)}入库，尚未首次跟进`,relatedId:c.id}));
+    (noFU3||[]).forEach(c=>alerts.push({type:'no_followup',level:'warning',title:'超3天未跟进',detail:`${c.name||c.customer_no} ${(c.created_at||'').slice(0,10)}入库，尚未首次跟进`,relatedId:c.id}));
     
     res.json(alerts);
   });
