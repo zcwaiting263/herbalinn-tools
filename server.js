@@ -146,7 +146,7 @@ initDB().then(() => {
   app.use(express.json({limit:'5mb'}));
   app.use(express.static(path.join(__dirname,'public')));
 
-  const tables = ['contents','customers','followups','orders','funnels'];
+  const tables = ['contents','customers','followups','orders','funnels','platforms'];
   tables.forEach(t => {
     const singular = t.replace(/s$/,'');
     const noKey = `${singular}_no`;
