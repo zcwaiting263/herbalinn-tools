@@ -98,7 +98,7 @@ async function logActivity(type, message, relatedId, user) {
 }
 
 const PREFIX={content:'CT',customer:'CU',followup:'FU',order:'OR'};
-function generateNo(prefix) { const now=new Date(); const dd=String(now.getDate()).padStart(2,'0'),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'); return prefix+'-'+dd+hh+mm; }
+function generateNo(prefix) { const now=new Date(); const dd=String(now.getDate()).padStart(2,'0'),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),ss=String(now.getSeconds()).padStart(2,'0'); return prefix+'-'+dd+hh+mm+ss; }
 
 
 
@@ -153,7 +153,7 @@ initDB().then(() => {
       
       if (!req.body[noKey]) {
         const cnt = (await client.execute(`SELECT COUNT(*) as c FROM ${t} WHERE ${noKey} LIKE '${singular.toUpperCase()}-%'`)).rows[0].c;
-        req.body[noKey] = generateNo(singular, cnt);
+        req.body[noKey] = generateNo(singular, seq);
       }
       
       const allCols = [...cols];
