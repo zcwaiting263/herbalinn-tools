@@ -284,17 +284,23 @@ const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups 
   });
 
   // Alerts
-  app.get('/api/alerts', async (req,res) => {
-    const alerts = []; const today = new Date().toISOString().slice(0,10);
-    const overdueFUs = (await client.execute({sql:`SELECT f.*,COALESCE(c.name,f.customer_no) as cn FROM followups f LEFT JOIN customers c ON f.customer_no=c.customer_no WHERE f.result NOT IN ('已成交','已流失') AND f.next_followup_time IS NOT NULL AND f.next_followup_time < ?`})).rows;
-    (overdueFUs||[]).forEach(f=>alerts.push({type:'overdue',level:'danger',title:'逾期未跟进',detail:`${f.cn} 上次${f.followup_time}，下次${f.next_followup_time}`,relatedId:f.id}));
-    
-    const d3=new Date(Date.now()-3*86400000).toISOString().slice(0,10);
-    const noFU3 = (await client.execute({sql:`SELECT * FROM customers WHERE stage='新线索' AND created_at < ? AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)`})).rows;
-    (noFU3||[]).forEach(c=>alerts.push({type:'no_followup',level:'warning',title:'超3天未跟进',detail:`${c.name||c.customer_no} ${(c.created_at||'').slice(0,10)}入库，尚未首次跟进`,relatedId:c.id}));
-    
+app.get('/api/alerts', async (req,res) => {
+    const alerts = [];
+    const today = new Date().toISOString().slice(0,10);
+    const d3 = new Date(Date.now()-3*86400000).toISOString().slice(0,10);
+    try {
+      const q1 = "SELECT f.followup_no,f.customer_no,f.followup_time,f.next_followup_time,f.result,f.id,COALESCE(c.name,f.customer_no) as cn FROM followups f LEFT JOIN customers c ON f.customer_no=c.customer_no WHERE f.result NOT IN ('已成交','已流失') AND f.next_followup_time IS NOT NULL AND f.next_followup_time < '" + today + "'";
+      const overdue = (await client.execute(q1)).rows || [];
+      overdue.forEach(f => alerts.push({type:'overdue', level:'danger', title:'逾期未跟进', detail: f.cn + ' 上次' + (f.followup_time||'') + ' 下次' + (f.next_followup_time||''), relatedId: f.id}));
+    } catch(e) { console.log('Alert1 err:', e.message); }
+    try {
+      const q2 = "SELECT customer_no,name,created_at,id FROM customers WHERE stage='新线索' AND created_at < '" + d3 + "' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)";
+      const nofu = (await client.execute(q2)).rows || [];
+      nofu.forEach(c => alerts.push({type:'no_followup', level:'warning', title:'超3天未跟进', detail: (c.name||c.customer_no) + ' ' + ((c.created_at||'').slice(0,10)) + ' 入库，尚未首次跟进', relatedId: c.id}));
+    } catch(e) { console.log('Alert2 err:', e.message); }
     res.json(alerts);
   });
+
 
   // Report
   app.get('/api/report/:type', async (req,res) => {
