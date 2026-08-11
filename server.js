@@ -153,7 +153,7 @@ initDB().then(() => {
       
       if (!req.body[noKey]) {
         const cnt = (await client.execute(`SELECT COUNT(*) as c FROM ${t} WHERE ${noKey} LIKE '${singular.toUpperCase()}-%'`)).rows[0].c;
-        req.body[noKey] = generateNo(singular, seq);
+        req.body[noKey] = generateNo(singular, cnt);
       }
       
       const allCols = [...cols];
