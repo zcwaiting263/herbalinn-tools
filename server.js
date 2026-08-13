@@ -567,14 +567,9 @@ app.post('/api/youzan/order-notify', async (req, res) => {
       try { payload = typeof payload.msg === 'string' ? JSON.parse(decodeURIComponent(payload.msg)) : payload.msg; } catch (e) {}
     }
 
-    // 订单付款事件（trade_TradeBuyerPay）→ 自动录入
-    const orderInfo = payload.full_order_info || payload.order_info || payload;
-    if (orderInfo.tid || payload.tid) {
-      const ingested = await youzanIngestOrder({ ...orderInfo, tid: orderInfo.tid || payload.tid });
-      console.log(`有赞 webhook 收到订单，录入结果: ${ingested}`);
-    } else {
-      console.log('有赞 webhook 收到非订单消息:', JSON.stringify(payload).slice(0, 200));
-    }
+    // 直接传给 youzanIngestOrder，让它自己解析格式（兼容 full_order_info 嵌套）
+    const ingested = await youzanIngestOrder(payload);
+    console.log('有赞 webhook 收到消息，录入结果:', ingested);
     // 有赞要求返回 {"code":0,"msg":"success"} 表示接收成功
     res.json({ code: 0, msg: 'success' });
   } catch (e) {
