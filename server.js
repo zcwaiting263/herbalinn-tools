@@ -508,7 +508,8 @@ app.post('/api/youzan/order-notify', async (req, res) => {
 app.post('/api/youzan/pull', async (req, res) => {
   try {
     const n = await youzanPullOrders();
-    res.json({ ok: true, pulled: n });
+  const raw = await youzanApi("youzan.trades.sold.get", "4.0.0", { page_no: 1, page_size: 1 });
+    res.json({ ok: true, pulled: n, raw_response: raw });
   } catch (e) {
     res.json({ ok: false, error: e.message });
   }
