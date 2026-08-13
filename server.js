@@ -431,24 +431,37 @@ async function youzanIngestOrder(order) {
     const exists = (await client.execute({ sql: 'SELECT id FROM orders WHERE order_no=?', args: ['YZ-' + orderNo] })).rows[0];
     if (exists) { console.log('有赞订单 ' + orderNo + ' 已录入，跳过'); return false; }
 
-    // 2. 查找或创建客户（优先用粉丝ID匹配，因姓名电话可能加密）
+    // 2. 查找或创建客户（按有赞 fans_id / youzan_uid 匹配，支持自动更新）
     let customerNo = null;
+    const fullAddress = [addrInfo.delivery_province, addrInfo.delivery_city, addrInfo.delivery_district].filter(Boolean).join(' ');
+
+    // 优先按 fans_id 精确匹配
     if (buyerInfo.fans_id) {
-      const c = (await client.execute({ sql: "SELECT customer_no FROM customers WHERE contact LIKE ?", args: ['%' + buyerInfo.fans_id + '%'] })).rows[0];
+      const c = (await client.execute({ sql: 'SELECT customer_no FROM customers WHERE fans_id=?', args: [String(buyerInfo.fans_id)] })).rows[0];
       if (c) customerNo = c.customer_no;
     }
-    if (!customerNo && buyerPhone && buyerPhone.indexOf('$1$') === -1) {
-      const c = (await client.execute({ sql: 'SELECT customer_no FROM customers WHERE contact=?', args: [buyerPhone] })).rows[0];
+    // 其次按 youzan_uid (outer_user_id) 匹配
+    if (!customerNo && buyerInfo.outer_user_id) {
+      const c = (await client.execute({ sql: 'SELECT customer_no FROM customers WHERE youzan_uid=?', args: [String(buyerInfo.outer_user_id)] })).rows[0];
       if (c) customerNo = c.customer_no;
     }
-    if (!customerNo) {
+
+    if (customerNo) {
+      // 已有客户 → 自动更新收货地址、最近下单、累计订单数、累计金额
+      await client.execute({
+        sql: "UPDATE customers SET receiver_address=?, last_order_time=?, last_order_no=?, total_orders=COALESCE(total_orders,0)+1, total_amount=COALESCE(total_amount,0)+?, updated_at=? WHERE customer_no=?",
+        args: [fullAddress, payTime, orderNo, amount, now, customerNo]
+      });
+      await logActivity('youzan', '有赞客户 ' + customerNo + ' 信息自动更新', customerNo, '有赞系统');
+    } else {
+      // 新客户 → 创建完整档案（含有赞字段）
       const dd = new Date(Date.now() + 8 * 3600000);
       const ts = String(dd.getMonth() + 1).padStart(2, '0') + String(dd.getDate()).padStart(2, '0') + String(dd.getHours()).padStart(2, '0') + String(dd.getMinutes()).padStart(2, '0') + String(dd.getSeconds()).padStart(2, '0');
       customerNo = 'CU-' + ts;
       const contactVal = buyerInfo.fans_id ? ('fans_id:' + buyerInfo.fans_id) : (buyerPhone || '');
       await client.execute({
-        sql: 'INSERT INTO customers (customer_no,name,contact,city,source_channel,stage,handler,created_at) VALUES (?,?,?,?,?,?,?,?)',
-        args: [customerNo, buyerName, contactVal, buyerCity, '有赞商城', '已购5L', '待分配', now]
+        sql: 'INSERT INTO customers (customer_no,name,contact,city,source_channel,stage,handler,fans_id,youzan_uid,receiver_name,receiver_address,last_order_time,last_order_no,total_orders,total_amount,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        args: [customerNo, buyerName, contactVal, buyerCity, '有赞商城', '已购5L', '待分配', String(buyerInfo.fans_id || ''), String(buyerInfo.outer_user_id || ''), buyerName, fullAddress, payTime, orderNo, 1, amount, now]
       });
       await logActivity('youzan', '有赞新客户 ' + buyerName + ' 自动建档', customerNo, '有赞系统');
     }
