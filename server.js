@@ -506,12 +506,40 @@ app.post('/api/youzan/order-notify', async (req, res) => {
 
 // 手动触发有赞订单拉取（测试/排障用）
 app.post('/api/youzan/pull', async (req, res) => {
+  const result = { ok: false, steps: [] };
   try {
-    const n = await youzanPullOrders();
-  const raw = await youzanApi("youzan.trades.sold.get", "4.0.0", { page_no: 1, page_size: 1 });
-    res.json({ ok: true, pulled: n, raw_response: raw });
+    result.steps.push('has_token:' + (!!YOUZAN_ACCESS_TOKEN));
+    result.steps.push('token_len:' + YOUZAN_ACCESS_TOKEN.length);
+    // 直接 fetch 有赞 API，捕获完整错误
+    const url = 'https://open.youzanyun.com/api/youzan.trades.sold.get/4.0.0?access_token=' + YOUZAN_ACCESS_TOKEN;
+    result.steps.push('calling: ' + url.slice(0, 60));
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page_no: 1, page_size: 1 })
+    });
+    result.steps.push('http_status: ' + resp.status);
+    const text = await resp.text();
+    result.steps.push('body_len: ' + text.length);
+    result.raw = text.slice(0, 800);
+    try {
+      const data = JSON.parse(text);
+      result.parsed = data;
+      if (data.gw_err_resp) {
+        result.ip_error = data.gw_err_resp.err_msg;
+        result.err_code = data.gw_err_resp.err_code;
+      }
+      if (data.code === 200 && data.data) {
+        result.ok = true;
+        result.order_count = (data.data.full_order_info_list || []).length;
+      }
+    } catch (e) {
+      result.parse_error = e.message;
+    }
+    res.json(result);
   } catch (e) {
-    res.json({ ok: false, error: e.message });
+    result.steps.push('exception: ' + e.message);
+    res.json(result);
   }
 });
 
