@@ -348,21 +348,20 @@ let YOUZAN_REFRESH_TOKEN = process.env.YOUZAN_REFRESH_TOKEN || '';
 async function youzanRefreshToken() {
   if (!YOUZAN_CLIENT_ID || !YOUZAN_CLIENT_SECRET) return null;
   try {
-    const body = new URLSearchParams({
-      client_id: YOUZAN_CLIENT_ID,
-      client_secret: YOUZAN_CLIENT_SECRET,
-      grant_type: 'refresh_token',
-      refresh_token: YOUZAN_REFRESH_TOKEN
-    });
     const resp = await fetch('https://open.youzanyun.com/auth/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        authorize_type: 'refresh_token',
+        client_id: YOUZAN_CLIENT_ID,
+        client_secret: YOUZAN_CLIENT_SECRET,
+        refresh_token: YOUZAN_REFRESH_TOKEN
+      })
     });
     const data = await resp.json();
-    if (data.success && data.data) {
-      YOUZAN_ACCESS_TOKEN = data.data.access_token || YOUZAN_ACCESS_TOKEN;
-      YOUZAN_REFRESH_TOKEN = data.data.refresh_token || YOUZAN_REFRESH_TOKEN;
+    if (data.success && data.data && data.data.access_token) {
+      YOUZAN_ACCESS_TOKEN = data.data.access_token;
+      if (data.data.refresh_token) YOUZAN_REFRESH_TOKEN = data.data.refresh_token;
       console.log('有赞 token 已刷新');
       return YOUZAN_ACCESS_TOKEN;
     }
