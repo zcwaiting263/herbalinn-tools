@@ -403,22 +403,41 @@ async function youzanApi(api, version, params = {}) {
 async function youzanIngestOrder(order) {
   const now = new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19);
   try {
-    const orderNo = order.tid || order.order_no || '';
-    const buyerName = (order.receiver_name || order.buyer_info?.fans_nickname || order.full_order_info?.order_info?.receiver_name || '有赞买家');
-    const buyerPhone = order.receiver_tel || order.full_order_info?.order_info?.receiver_tel || '';
-    const amount = Number(order.payment || order.price || order.full_order_info?.order_info?.payment || 0) / 100 || 0;
-    const productName = order.title || order.full_order_info?.order_info?.title || '低氘水订单';
-    const payTime = (order.pay_time || order.full_order_info?.order_info?.pay_time || now).replace('T', ' ').slice(0, 19);
+    // 兼容两种格式：直接订单对象 / 嵌套 full_order_info
+    const fi = order.full_order_info || order;
+    const orderInfo = fi.order_info || {};
+    const subOrders = fi.orders || [];
+    const payInfo = fi.pay_info || {};
+    const buyerInfo = fi.buyer_info || {};
+    const addrInfo = fi.address_info || {};
+
+    const orderNo = orderInfo.tid || order.tid || order.order_no || '';
+    // 商品标题在子订单 orders[0].title
+    const productName = (subOrders[0] && subOrders[0].title) || orderInfo.title || '有赞订单';
+    // 有赞金额单位是「元」，不是分
+    const amount = Number(payInfo.payment || (subOrders[0] && subOrders[0].payment) || orderInfo.payment || 0);
+    // 买家昵称/手机号可能被有赞加密（$...$1$ 格式），用 fans_id 兜底
+    const rawName = buyerInfo.fans_nickname || addrInfo.receiver_name || '';
+    const isEncrypted = typeof rawName === 'string' && rawName.indexOf('$1$') > -1;
+    const buyerName = (!rawName || isEncrypted) ? ('有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : '')) : rawName;
+    const buyerPhone = buyerInfo.buyer_phone || addrInfo.receiver_tel || '';
+    const buyerCity = addrInfo.delivery_province || '';
+    const payTime = (orderInfo.pay_time || orderInfo.created || now).replace('T', ' ').slice(0, 19);
+    const quantity = (subOrders[0] && subOrders[0].num) || 1;
 
     if (!orderNo) { console.log('有赞订单缺少订单号，跳过'); return false; }
 
-    // 1. 检查订单是否已录入（幂等，防重复）
+    // 1. 幂等检查，防重复录入
     const exists = (await client.execute({ sql: 'SELECT id FROM orders WHERE order_no=?', args: ['YZ-' + orderNo] })).rows[0];
-    if (exists) { console.log(`有赞订单 ${orderNo} 已录入，跳过`); return false; }
+    if (exists) { console.log('有赞订单 ' + orderNo + ' 已录入，跳过'); return false; }
 
-    // 2. 查找或创建客户（按手机号匹配）
+    // 2. 查找或创建客户（优先用粉丝ID匹配，因姓名电话可能加密）
     let customerNo = null;
-    if (buyerPhone) {
+    if (buyerInfo.fans_id) {
+      const c = (await client.execute({ sql: "SELECT customer_no FROM customers WHERE contact LIKE ?", args: ['%' + buyerInfo.fans_id + '%'] })).rows[0];
+      if (c) customerNo = c.customer_no;
+    }
+    if (!customerNo && buyerPhone && buyerPhone.indexOf('$1$') === -1) {
       const c = (await client.execute({ sql: 'SELECT customer_no FROM customers WHERE contact=?', args: [buyerPhone] })).rows[0];
       if (c) customerNo = c.customer_no;
     }
@@ -426,21 +445,22 @@ async function youzanIngestOrder(order) {
       const dd = new Date(Date.now() + 8 * 3600000);
       const ts = String(dd.getMonth() + 1).padStart(2, '0') + String(dd.getDate()).padStart(2, '0') + String(dd.getHours()).padStart(2, '0') + String(dd.getMinutes()).padStart(2, '0') + String(dd.getSeconds()).padStart(2, '0');
       customerNo = 'CU-' + ts;
+      const contactVal = buyerInfo.fans_id ? ('fans_id:' + buyerInfo.fans_id) : (buyerPhone || '');
       await client.execute({
-        sql: 'INSERT INTO customers (customer_no,name,contact,source_channel,stage,handler,created_at) VALUES (?,?,?,?,?,?,?)',
-        args: [customerNo, buyerName, buyerPhone, '有赞商城', '已购5L', '待分配', now]
+        sql: 'INSERT INTO customers (customer_no,name,contact,city,source_channel,stage,handler,created_at) VALUES (?,?,?,?,?,?,?,?)',
+        args: [customerNo, buyerName, contactVal, buyerCity, '有赞商城', '已购5L', '待分配', now]
       });
-      await logActivity('youzan', `有赞新客户 ${buyerName} 自动建档`, customerNo, '有赞系统');
+      await logActivity('youzan', '有赞新客户 ' + buyerName + ' 自动建档', customerNo, '有赞系统');
     }
 
     // 3. 录入订单
     await client.execute({
       sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
-      args: ['YZ-' + orderNo, customerNo, '5L首单', 1, amount, '已支付', payTime, '待发货', '有赞自动', now]
+      args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', now]
     });
-    await logActivity('youzan', `有赞订单 ${orderNo} 自动录入 ¥${amount}`, customerNo, '有赞系统');
+    await logActivity('youzan', '有赞订单 ' + orderNo + ' 自动录入 ¥' + amount + ' [' + productName + ']', customerNo, '有赞系统');
 
-    console.log(`✅ 有赞订单 ${orderNo} 已自动接管录入`);
+    console.log('✅ 有赞订单 ' + orderNo + ' 已自动接管录入 ¥' + amount);
     return true;
   } catch (e) {
     console.log('有赞订单录入异常:', e.message);
