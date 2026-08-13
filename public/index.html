@@ -521,5 +521,14 @@ function initPlatformAutoFill(){
   });
 };
 </script>
+<div id="fallback-bar" style="position:fixed;right:14px;bottom:14px;z-index:60;background:#fff;border:1px solid var(--b1);border-radius:8px;padding:8px 12px;box-shadow:var(--sh);font-size:12px;color:var(--t3);display:none">
+  主域名异常？<a href="https://herbalinn-tools.onrender.com" target="_blank" style="color:var(--g3);font-weight:500">备用入口</a>
+</div>
+<script>
+(function(){
+  var bar=document.getElementById('fallback-bar');
+  if(location.hostname.indexOf('herbalinn-tools.onrender.com')===-1) bar.style.display='block';
+})();
+</script>
 </body>
 </html>
