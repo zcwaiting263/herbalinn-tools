@@ -504,6 +504,16 @@ app.post('/api/youzan/order-notify', async (req, res) => {
   }
 });
 
+// 手动触发有赞订单拉取（测试/排障用）
+app.post('/api/youzan/pull', async (req, res) => {
+  try {
+    const n = await youzanPullOrders();
+    res.json({ ok: true, pulled: n });
+  } catch (e) {
+    res.json({ ok: false, error: e.message });
+  }
+});
+
 // 有赞状态查询端点（工作台内查看接入状态）
 app.get('/api/youzan/status', async (req, res) => {
   res.json({
