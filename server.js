@@ -288,7 +288,7 @@ initDB().then(() => {
     const leadCount = (await client.execute(`SELECT COUNT(*) as c FROM customers`)).rows[0].c;
     const orderCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE pay_status='已支付'`)).rows[0].c;
     const monthCardCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE product_type='月卡' AND pay_status='已支付'`)).rows[0].c;
-const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time < '" + today + "'")).rows[0].c;
+const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time < '" + now + "'")).rows[0].c;
     const noFollowupCount = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage='新线索' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)`)).rows[0].c;
     const stageDist = (await client.execute(`SELECT stage,COUNT(*) as c FROM customers GROUP BY stage`)).rows;
     const converted = (await client.execute(`SELECT COUNT(*) as c FROM customers WHERE stage IN ('已购5L','月卡')`)).rows[0].c;
