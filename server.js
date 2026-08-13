@@ -424,6 +424,15 @@ async function youzanIngestOrder(order) {
     const buyerCity = addrInfo.delivery_province || '';
     const payTime = (orderInfo.pay_time || orderInfo.created || now).replace('T', ' ').slice(0, 19);
     const quantity = (subOrders[0] && subOrders[0].num) || 1;
+    // 有赞订单扩展字段
+    const remarkInfo = fi.remark_info || {};
+    const buyerMessage = remarkInfo.buyer_message || '';
+    const youzanOid = (subOrders[0] && subOrders[0].oid) || '';
+    const itemId = (subOrders[0] && subOrders[0].item_id) || '';
+    const skuArr = (subOrders[0] && subOrders[0].sku_properties_name) || [];
+    const sku = Array.isArray(skuArr) ? skuArr.map(function(s){ return (s.k || '') + ':' + (s.v || ''); }).join(';') : '';
+    const postFee = Number(payInfo.post_fee || 0);
+    const youzanStatus = orderInfo.status || '';
 
     if (!orderNo) { console.log('有赞订单缺少订单号，跳过'); return false; }
 
@@ -468,8 +477,8 @@ async function youzanIngestOrder(order) {
 
     // 3. 录入订单
     await client.execute({
-      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
-      args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', now]
+      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,youzan_oid,item_id,sku,post_fee,buyer_message,youzan_status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', String(youzanOid), String(itemId), sku, postFee, buyerMessage, youzanStatus, now]
     });
     await logActivity('youzan', '有赞订单 ' + orderNo + ' 自动录入 ¥' + amount + ' [' + productName + ']', customerNo, '有赞系统');
 
