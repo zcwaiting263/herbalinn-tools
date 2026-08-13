@@ -509,12 +509,49 @@ async function youzanPullOrders() {
   }
 }
 
+// 有赞订单状态同步（更新工作台已有订单的配送状态/有赞状态）
+async function youzanSyncOrders() {
+  if (!YOUZAN_ACCESS_TOKEN) return 0;
+  try {
+    const data = await youzanApi('youzan.trades.sold.get', '4.0.0', { page_no: 1, page_size: 30 });
+    const trades = (data && data.data && data.data.full_order_info_list) || [];
+    let updated = 0;
+    const statusMap = {
+      'WAIT_SELLER_SEND_GOODS': '待发货',
+      'WAIT_BUYER_CONFIRM_GOODS': '已发货',
+      'TRADE_SUCCESS': '已签收',
+      'TRADE_CLOSED': '已关闭'
+    };
+    for (const t of trades) {
+      const fi = t.full_order_info || {};
+      const info = fi.order_info || {};
+      const tid = info.tid || '';
+      if (!tid) continue;
+      const yzStatus = info.status || '';
+      const delivery = statusMap[yzStatus] || '待发货';
+      const payTime = (info.pay_time || info.created || '').replace('T', ' ').slice(0, 19);
+      // 更新工作台订单
+      const r = await client.execute({
+        sql: "UPDATE orders SET youzan_status=?, delivery_status=? WHERE order_no=? AND (youzan_status IS NULL OR youzan_status<>?)",
+        args: [yzStatus, delivery, 'YZ-' + tid, yzStatus]
+      });
+      updated += r.rowsAffected || 0;
+    }
+    if (updated > 0) console.log('有赞订单状态同步：更新 ' + updated + ' 单');
+    return updated;
+  } catch (e) {
+    console.log('有赞同步异常:', e.message);
+    return 0;
+  }
+}
+
 // 定时拉取（每 5 分钟）
 setInterval(async () => {
   if (!YOUZAN_CLIENT_ID) return; // 未配置凭据则不执行
   try {
     const n = await youzanPullOrders();
-    if (n > 0) console.log(`有赞定时拉取：新增 ${n} 单`);
+    if (n > 0) console.log('有赞定时拉取：新增 ' + n + ' 单');
+    await youzanSyncOrders(); // 同步订单状态
   } catch (e) { console.log('有赞定时任务异常:', e.message); }
 }, 5 * 60 * 1000);
 
