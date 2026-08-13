@@ -64,7 +64,18 @@ async function initDB() {
     product_type TEXT, quantity INTEGER DEFAULT 1,
     amount REAL DEFAULT 0, pay_status TEXT DEFAULT '待支付',
     pay_time TEXT, delivery_status TEXT DEFAULT '待发货',
-    rebuy_count INTEGER DEFAULT 0, created_at TEXT
+    rebuy_count INTEGER DEFAULT 0, created_at TEXT,
+    order_handler TEXT,
+    youzan_oid TEXT, item_id TEXT, sku TEXT,
+    post_fee REAL DEFAULT 0, buyer_message TEXT, youzan_status TEXT,
+    order_type TEXT, source TEXT, pay_method TEXT, payment_no TEXT,
+    goods_amount REAL DEFAULT 0, shop_discount REAL DEFAULT 0,
+    success_time TEXT,
+    receiver_name TEXT, receiver_phone TEXT,
+    receiver_province TEXT, receiver_city TEXT, receiver_district TEXT, receiver_address TEXT,
+    buyer_nickname TEXT, buyer_phone TEXT,
+    refund_status TEXT, refund_amount REAL DEFAULT 0,
+    distributor TEXT, coupon_name TEXT
   )`);
   await client.execute(`CREATE TABLE IF NOT EXISTS funnels (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,6 +94,23 @@ async function initDB() {
     type TEXT, message TEXT, related_id TEXT,
     created_by TEXT DEFAULT 'system', created_at TEXT
   )`);
+
+  // 订单表字段迁移（兼容老数据库，逐列补加，已存在则跳过）
+  const orderCols = [
+    ['order_handler','TEXT'],['youzan_oid','TEXT'],['item_id','TEXT'],['sku','TEXT'],
+    ['post_fee','REAL DEFAULT 0'],['buyer_message','TEXT'],['youzan_status','TEXT'],
+    ['order_type','TEXT'],['source','TEXT'],['pay_method','TEXT'],['payment_no','TEXT'],
+    ['goods_amount','REAL DEFAULT 0'],['shop_discount','REAL DEFAULT 0'],['success_time','TEXT'],
+    ['receiver_name','TEXT'],['receiver_phone','TEXT'],
+    ['receiver_province','TEXT'],['receiver_city','TEXT'],['receiver_district','TEXT'],['receiver_address','TEXT'],
+    ['buyer_nickname','TEXT'],['buyer_phone','TEXT'],
+    ['refund_status','TEXT'],['refund_amount','REAL DEFAULT 0'],
+    ['distributor','TEXT'],['coupon_name','TEXT']
+  ];
+  for (const [col, typ] of orderCols) {
+    try { await client.execute(`ALTER TABLE orders ADD COLUMN ${col} ${typ}`); }
+    catch(e) { /* 列已存在，跳过 */ }
+  }
 
   // Init users
   const initUsers = [
@@ -439,6 +467,26 @@ async function youzanIngestOrder(order) {
     const postFee = Number(payInfo.post_fee || 0);
     const youzanStatus = orderInfo.status || '';
 
+    // 有赞订单核心信息（对应商家后台导出表字段）
+    const orderType = orderInfo.order_type || '';
+    const source = orderInfo.source || '';
+    const payMethod = payInfo.payment_channel || payInfo.pay_type || orderInfo.pay_type || '';
+    const paymentNo = payInfo.transaction_no || payInfo.trade_no || '';
+    const goodsAmount = Number(payInfo.goods_amount || 0);
+    const shopDiscount = Number(payInfo.discount_fee || payInfo.shop_discount || 0);
+    const successTime = (orderInfo.success_time || '').replace('T', ' ').slice(0, 19);
+    const receiverName = addrInfo.receiver_name || '';
+    const receiverPhone = addrInfo.receiver_tel || buyerPhone || '';
+    const receiverProvince = addrInfo.delivery_province || '';
+    const receiverCity = addrInfo.delivery_city || '';
+    const receiverDistrict = addrInfo.delivery_district || '';
+    const receiverAddress = addrInfo.delivery_address || '';
+    const buyerNickname = buyerInfo.fans_nickname || '';
+    const refundStatus = orderInfo.refund_state || orderInfo.refund_status || '';
+    const refundAmount = Number((fi.refund_order && fi.refund_order.refund_fee) || 0);
+    const distributor = orderInfo.salesman || fi.salesman || '';
+    const couponName = (orderInfo.coupon_details && orderInfo.coupon_details[0] && orderInfo.coupon_details[0].name) || '';
+
     if (!orderNo) { console.log('有赞订单缺少订单号，跳过'); return false; }
 
     // 1. 幂等检查，防重复录入
@@ -482,8 +530,8 @@ async function youzanIngestOrder(order) {
 
     // 3. 录入订单
     await client.execute({
-      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,youzan_oid,item_id,sku,post_fee,buyer_message,youzan_status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', String(youzanOid), String(itemId), sku, postFee, buyerMessage, youzanStatus, now]
+      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,youzan_oid,item_id,sku,post_fee,buyer_message,youzan_status,order_type,source,pay_method,payment_no,goods_amount,shop_discount,success_time,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_district,receiver_address,buyer_nickname,buyer_phone,refund_status,refund_amount,distributor,coupon_name,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', String(youzanOid), String(itemId), sku, postFee, buyerMessage, youzanStatus, orderType, source, payMethod, paymentNo, goodsAmount, shopDiscount, successTime, receiverName, receiverPhone, receiverProvince, receiverCity, receiverDistrict, receiverAddress, buyerNickname, buyerPhone, refundStatus, refundAmount, distributor, couponName, now]
     });
     await logActivity('youzan', '有赞订单 ' + orderNo + ' 自动录入 ¥' + amount + ' [' + productName + ']', customerNo, '有赞系统');
 
