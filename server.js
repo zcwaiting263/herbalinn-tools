@@ -112,8 +112,12 @@ async function logActivity(type, message, relatedId, user) {
   await client.execute({sql:'INSERT INTO activity_log (type,message,related_id,created_by,created_at) VALUES (?,?,?,?,?)',args:[type,message,String(relatedId||''),user||'system',now]});
 }
 
-const PREFIX={content:'CT',customer:'CU',followup:'FU',order:'OR'};
-function generateNo(prefix) { const now=new Date(); const dd=String(now.getDate()).padStart(2,'0'),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),ss=String(now.getSeconds()).padStart(2,'0'); return prefix+'-'+dd+hh+mm+ss; }
+const PREFIX={content:'CT',customer:'CU',followup:'FU',order:'OR',platform:'PL',funnel:'FN'};
+function generateNo(prefix, seq) {
+  const now=new Date();
+  const dd=String(now.getDate()).padStart(2,'0'),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),ss=String(now.getSeconds()).padStart(2,'0');
+  return prefix+'-'+dd+hh+mm+ss+'-'+String(seq+1).padStart(3,'0');
+}
 
 
 
@@ -168,8 +172,9 @@ initDB().then(() => {
       const cols = (await getCols(t)).filter(c => c!=='id'&&c!=='created_at'&&c!=='updated_at');
       
       if (!req.body[noKey]) {
-        const cnt = (await client.execute(`SELECT COUNT(*) as c FROM ${t} WHERE ${noKey} LIKE '${singular.toUpperCase()}-%'`)).rows[0].c;
-        req.body[noKey] = generateNo(singular, seq);
+        const pfx = PREFIX[singular] || singular.toUpperCase().slice(0,2);
+        const cnt = (await client.execute(`SELECT COUNT(*) as c FROM ${t} WHERE ${noKey} LIKE '${pfx}-%'`)).rows[0].c;
+        req.body[noKey] = generateNo(pfx, cnt);
       }
       
       const allCols = [...cols];
@@ -629,6 +634,21 @@ app.get('/api/youzan/status', async (req, res) => {
 });
 
 // ============ 有赞模块结束 ============
+
+// 健康检查端点（用于监控和验证部署）
+app.get('/api/health', async (req, res) => {
+  try {
+    const dbCheck = await client.execute('SELECT 1');
+    res.json({
+      ok: true,
+      time: new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19),
+      db: dbCheck ? 'connected' : 'error',
+      version: '1.0.1'
+    });
+  } catch (e) {
+    res.status(503).json({ ok: false, error: e.message });
+  }
+});
 
 app.listen(PORT, () => console.log(`HERBALINN on port ${PORT}, Turso: ${TURSO_URL}`));
 });
