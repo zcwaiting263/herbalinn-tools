@@ -285,7 +285,7 @@ initDB().then(() => {
   // Stats
   app.get('/api/stats', async (req,res) => {
     const today = new Date().toISOString().slice(0,10);
-    const now = new Date().toISOString().slice(0,19);
+    const now = new Date(Date.now()+8*3600000).toISOString().slice(0,19);
     const leadCount = (await client.execute(`SELECT COUNT(*) as c FROM customers`)).rows[0].c;
     const orderCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE pay_status='已支付'`)).rows[0].c;
     const monthCardCount = (await client.execute(`SELECT COUNT(*) as c FROM orders WHERE product_type='月卡' AND pay_status='已支付'`)).rows[0].c;
@@ -302,7 +302,7 @@ const overdueCount = (await client.execute("SELECT COUNT(*) as c FROM followups 
 app.get('/api/alerts', async (req,res) => {
     const alerts = [];
     const today = new Date().toISOString().slice(0,10);
-    const now = new Date().toISOString().slice(0,19);
+    const now = new Date(Date.now()+8*3600000).toISOString().slice(0,19);
     const d3 = new Date(Date.now()-3*86400000).toISOString().slice(0,10);
     try {
       const q1 = "SELECT f.followup_no,f.customer_no,f.followup_time,f.next_followup_time,f.result,f.id,COALESCE(c.name,f.customer_no) as cn FROM followups f LEFT JOIN customers c ON f.customer_no=c.customer_no WHERE f.result NOT IN ('已成交','已流失') AND f.next_followup_time IS NOT NULL AND f.next_followup_time < '" + now + "'";
