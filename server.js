@@ -144,6 +144,7 @@ async function checkAutoFlow(event, id, data, user) {
 // Init & start
 initDB().then(() => {
   app.use(express.json({limit:'5mb'}));
+  app.use(express.urlencoded({extended:true, limit:'5mb'}));
   app.use(express.static(path.join(__dirname,'public')));
 
   const tables = ['contents','customers','followups','orders','funnels','platforms'];
@@ -335,5 +336,187 @@ app.get('/api/alerts', async (req,res) => {
     res.json((await client.execute(`SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 50`)).rows);
   });
 
-  app.listen(PORT, () => console.log(`HERBALINN on port ${PORT}, Turso: ${TURSO_URL}`));
+  // ============ 有赞订单自动接入模块 ============
+// 环境变量：YOUZAN_CLIENT_ID / YOUZAN_CLIENT_SECRET / YOUZAN_ACCESS_TOKEN / YOUZAN_REFRESH_TOKEN / YOUZAN_SHOP_ID
+
+const YOUZAN_CLIENT_ID = process.env.YOUZAN_CLIENT_ID || '';
+const YOUZAN_CLIENT_SECRET = process.env.YOUZAN_CLIENT_SECRET || '';
+let YOUZAN_ACCESS_TOKEN = process.env.YOUZAN_ACCESS_TOKEN || '';
+let YOUZAN_REFRESH_TOKEN = process.env.YOUZAN_REFRESH_TOKEN || '';
+
+// 有赞 token 刷新（access_token 2 小时过期）
+async function youzanRefreshToken() {
+  if (!YOUZAN_CLIENT_ID || !YOUZAN_CLIENT_SECRET) return null;
+  try {
+    const body = new URLSearchParams({
+      client_id: YOUZAN_CLIENT_ID,
+      client_secret: YOUZAN_CLIENT_SECRET,
+      grant_type: 'refresh_token',
+      refresh_token: YOUZAN_REFRESH_TOKEN
+    });
+    const resp = await fetch('https://open.youzanyun.com/auth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body
+    });
+    const data = await resp.json();
+    if (data.success && data.data) {
+      YOUZAN_ACCESS_TOKEN = data.data.access_token || YOUZAN_ACCESS_TOKEN;
+      YOUZAN_REFRESH_TOKEN = data.data.refresh_token || YOUZAN_REFRESH_TOKEN;
+      console.log('有赞 token 已刷新');
+      return YOUZAN_ACCESS_TOKEN;
+    }
+    console.log('有赞 token 刷新失败:', JSON.stringify(data).slice(0, 200));
+    return null;
+  } catch (e) {
+    console.log('有赞 token 刷新异常:', e.message);
+    return null;
+  }
+}
+
+// 有赞 API 调用（自动处理 token 过期）
+async function youzanApi(api, version, params = {}) {
+  if (!YOUZAN_ACCESS_TOKEN) {
+    await youzanRefreshToken();
+  }
+  if (!YOUZAN_ACCESS_TOKEN) return null;
+  try {
+    const url = `https://open.youzanyun.com/api/${api}/${version}?access_token=${YOUZAN_ACCESS_TOKEN}`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    const data = await resp.json();
+    // token 过期则刷新后重试一次
+    if (data.code === 140500101 || (data.error_response && data.error_response.code === 140500101)) {
+      await youzanRefreshToken();
+      return youzanApi(api, version, params);
+    }
+    return data;
+  } catch (e) {
+    console.log('有赞 API 异常:', e.message);
+    return null;
+  }
+}
+
+// 有赞订单 → 工作台客户 + 订单记录（核心：自动接管、自动录入）
+async function youzanIngestOrder(order) {
+  const now = new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19);
+  try {
+    const orderNo = order.tid || order.order_no || '';
+    const buyerName = (order.receiver_name || order.buyer_info?.fans_nickname || order.full_order_info?.order_info?.receiver_name || '有赞买家');
+    const buyerPhone = order.receiver_tel || order.full_order_info?.order_info?.receiver_tel || '';
+    const amount = Number(order.payment || order.price || order.full_order_info?.order_info?.payment || 0) / 100 || 0;
+    const productName = order.title || order.full_order_info?.order_info?.title || '低氘水订单';
+    const payTime = (order.pay_time || order.full_order_info?.order_info?.pay_time || now).replace('T', ' ').slice(0, 19);
+
+    if (!orderNo) { console.log('有赞订单缺少订单号，跳过'); return false; }
+
+    // 1. 检查订单是否已录入（幂等，防重复）
+    const exists = (await client.execute({ sql: 'SELECT id FROM orders WHERE order_no=?', args: ['YZ-' + orderNo] })).rows[0];
+    if (exists) { console.log(`有赞订单 ${orderNo} 已录入，跳过`); return false; }
+
+    // 2. 查找或创建客户（按手机号匹配）
+    let customerNo = null;
+    if (buyerPhone) {
+      const c = (await client.execute({ sql: 'SELECT customer_no FROM customers WHERE contact=?', args: [buyerPhone] })).rows[0];
+      if (c) customerNo = c.customer_no;
+    }
+    if (!customerNo) {
+      const dd = new Date(Date.now() + 8 * 3600000);
+      const ts = String(dd.getMonth() + 1).padStart(2, '0') + String(dd.getDate()).padStart(2, '0') + String(dd.getHours()).padStart(2, '0') + String(dd.getMinutes()).padStart(2, '0') + String(dd.getSeconds()).padStart(2, '0');
+      customerNo = 'CU-' + ts;
+      await client.execute({
+        sql: 'INSERT INTO customers (customer_no,name,contact,source_channel,stage,handler,created_at) VALUES (?,?,?,?,?,?,?)',
+        args: [customerNo, buyerName, buyerPhone, '有赞商城', '已购5L', '待分配', now]
+      });
+      await logActivity('youzan', `有赞新客户 ${buyerName} 自动建档`, customerNo, '有赞系统');
+    }
+
+    // 3. 录入订单
+    await client.execute({
+      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
+      args: ['YZ-' + orderNo, customerNo, '5L首单', 1, amount, '已支付', payTime, '待发货', '有赞自动', now]
+    });
+    await logActivity('youzan', `有赞订单 ${orderNo} 自动录入 ¥${amount}`, customerNo, '有赞系统');
+
+    console.log(`✅ 有赞订单 ${orderNo} 已自动接管录入`);
+    return true;
+  } catch (e) {
+    console.log('有赞订单录入异常:', e.message);
+    return false;
+  }
+}
+
+// 有赞订单查询接口（定时拉取兜底）
+async function youzanPullOrders() {
+  if (!YOUZAN_ACCESS_TOKEN) return 0;
+  try {
+    const data = await youzanApi('youzan.trades.sold.get', '4.0.0', {
+      page_no: 1, page_size: 20, status: 'WAIT_SELLER_SEND_GOODS'
+    });
+    const trades = data?.response?.full_order_info_list || data?.data?.full_order_info_list || [];
+    let count = 0;
+    for (const t of trades) {
+      if (await youzanIngestOrder(t)) count++;
+    }
+    return count;
+  } catch (e) {
+    console.log('有赞拉取异常:', e.message);
+    return 0;
+  }
+}
+
+// 定时拉取（每 5 分钟）
+setInterval(async () => {
+  if (!YOUZAN_CLIENT_ID) return; // 未配置凭据则不执行
+  try {
+    const n = await youzanPullOrders();
+    if (n > 0) console.log(`有赞定时拉取：新增 ${n} 单`);
+  } catch (e) { console.log('有赞定时任务异常:', e.message); }
+}, 5 * 60 * 1000);
+
+// Webhook 接收端点（有赞消息推送）
+app.post('/api/youzan/order-notify', async (req, res) => {
+  try {
+    // 有赞推送消息体在 msg 字段（可能是 JSON 字符串或 URL 编码）
+    let payload = req.body;
+    if (typeof req.body === 'string') {
+      try { payload = JSON.parse(req.body); } catch { payload = { raw: req.body }; }
+    }
+    if (payload.msg) {
+      try { payload = typeof payload.msg === 'string' ? JSON.parse(decodeURIComponent(payload.msg)) : payload.msg; } catch (e) {}
+    }
+
+    // 订单付款事件（trade_TradeBuyerPay）→ 自动录入
+    const orderInfo = payload.full_order_info || payload.order_info || payload;
+    if (orderInfo.tid || payload.tid) {
+      const ingested = await youzanIngestOrder({ ...orderInfo, tid: orderInfo.tid || payload.tid });
+      console.log(`有赞 webhook 收到订单，录入结果: ${ingested}`);
+    } else {
+      console.log('有赞 webhook 收到非订单消息:', JSON.stringify(payload).slice(0, 200));
+    }
+    // 有赞要求返回 {"code":0,"msg":"success"} 表示接收成功
+    res.json({ code: 0, msg: 'success' });
+  } catch (e) {
+    console.log('有赞 webhook 异常:', e.message);
+    res.json({ code: 0, msg: 'success' }); // 仍返回成功避免有赞重试轰炸
+  }
+});
+
+// 有赞状态查询端点（工作台内查看接入状态）
+app.get('/api/youzan/status', async (req, res) => {
+  res.json({
+    configured: !!(YOUZAN_CLIENT_ID && YOUZAN_CLIENT_SECRET),
+    has_token: !!YOUZAN_ACCESS_TOKEN,
+    client_id: YOUZAN_CLIENT_ID ? YOUZAN_CLIENT_ID.slice(0, 6) + '***' : '',
+    shop_id: process.env.YOUZAN_SHOP_ID || '',
+    order_count: (await client.execute("SELECT COUNT(*) as c FROM orders WHERE order_no LIKE 'YZ-%'")).rows[0].c
+  });
+});
+
+// ============ 有赞模块结束 ============
+
+app.listen(PORT, () => console.log(`HERBALINN on port ${PORT}, Turso: ${TURSO_URL}`));
 });
