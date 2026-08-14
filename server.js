@@ -466,7 +466,7 @@ async function youzanIngestOrder(order) {
     const buyerName = (!rawName || isEncrypted) ? ('有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : '')) : rawName;
     const buyerPhone = buyerInfo.buyer_phone || addrInfo.receiver_tel || '';
     const buyerCity = addrInfo.delivery_province || '';
-    const payTime = (orderInfo.pay_time || orderInfo.created || now).replace('T', ' ').slice(0, 19);
+    const payTime = (orderInfo.pay_time || orderInfo.created || now).replace(/[T+]/g, ' ').slice(0, 19);
     const quantity = (subOrders[0] && subOrders[0].num) || 1;
     // 有赞订单扩展字段
     const remarkInfo = fi.remark_info || {};
@@ -485,7 +485,7 @@ async function youzanIngestOrder(order) {
     const paymentNo = payInfo.transaction_no || payInfo.trade_no || '';
     const goodsAmount = Number(payInfo.goods_amount || 0);
     const shopDiscount = Number(payInfo.discount_fee || payInfo.shop_discount || 0);
-    const successTime = (orderInfo.success_time || '').replace('T', ' ').slice(0, 19);
+    const successTime = (orderInfo.success_time || '').replace(/[T+]/g, ' ').slice(0, 19);
     const receiverName = addrInfo.receiver_name || '';
     const receiverPhone = addrInfo.receiver_tel || buyerPhone || '';
     const receiverProvince = addrInfo.delivery_province || '';
