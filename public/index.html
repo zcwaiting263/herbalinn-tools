@@ -160,6 +160,21 @@ tr:hover td{background:#f2f6f2}
   .stat-card{padding:14px 16px}.stat-card .num{font-size:28px}
   table{font-size:12px}th,td{padding:8px 10px}
 }
+.daily-tasks-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dt-title{font-size:14px;font-weight:500;color:var(--t1)}
+.dt-user{font-size:12px;color:var(--g3);font-weight:500;background:#f0f8f2;padding:3px 10px;border-radius:12px}
+.dt-list{display:flex;flex-direction:column;gap:6px}
+.dt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fafbfa;border-radius:8px;cursor:pointer;font-size:14px;transition:background .15s}
+.dt-item:hover{background:#f0f3f1}
+.dt-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--g3);cursor:pointer;flex-shrink:0}
+.dt-item span{flex:1}
+.dt-cat{font-style:normal;font-size:11px;color:var(--t4);background:var(--b1);padding:1px 8px;border-radius:8px;flex-shrink:0}
+.team-task-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f3f5f3}
+.team-task-row:last-child{border-bottom:none}
+.tt-name{width:64px;font-size:13px;font-weight:500;color:var(--t1);flex-shrink:0}
+.tt-bar{flex:1;height:8px;background:#eef0ee;border-radius:6px;overflow:hidden}
+.tt-bar-fill{height:100%;border-radius:6px;transition:width .3s}
+.tt-num{font-size:12px;color:var(--t3);min-width:40px;text-align:right;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -192,7 +207,8 @@ tr:hover td{background:#f2f6f2}
 <div class="module-page active" id="page-dashboard">
 <div class="stats-row" id="statsRow"></div>
 <div class="alerts-row" id="alertsRow"></div>
-<div class="panel" style="margin-bottom:16px"><div class="panel-h">今日任务 <span style="font-size:12px;color:var(--t4);font-weight:400">核心团队每日任务自动派发</span></div><div class="panel-b" id="dailyTasksPanel"></div></div>
+<div class="panel" style="margin-bottom:16px"><div class="panel-h">今日任务 <span style="font-size:12px;color:var(--t4);font-weight:400">核心团队每日任务自动派发</span><button class="export-btn" onclick="manualGenerateTasks()" style="font-size:12px">手动派发</button></div><div class="panel-b" id="dailyTasksPanel"></div></div>
+<div class="panel" style="margin-bottom:16px"><div class="panel-h">团队任务总览 <span style="font-size:12px;color:var(--t4);font-weight:400">全员完成进度</span></div><div class="panel-b" id="teamTasksPanel"></div></div>
 <div class="panel" style="margin-bottom:16px" id="backupPanel">
   <div class="panel-h">数据安全 <span style="font-size:12px;color:var(--t4);font-weight:400">更新前先导出，更新后恢复</span></div>
   <div class="panel-b">
@@ -281,92 +297,90 @@ function switchPage(page){
   if(m[page])m[page]()
 }
 
-// Daily task dispatch for core team members
-var TEAM_TASKS = {
-  '陈丹千': [
-    '审阅今日运营仪表盘关键数据',
-    '检查月卡用户复购趋势',
-    '批阅高客单转化漏斗报告'
-  ],
-  'Amy': [
-    '复核昨日内容工坊发布数据',
-    '跟进客户中心所有待体验客户',
-    '整理本周订单管理异常列表'
-  ],
-  '小廖': [
-    '处理客户中心新线索（3 天内）',
-    '跟进所有逾期未跟进的客户',
-    '更新平台入驻进度至本周状态'
-  ],
-  '张成': [
-    '检查 Render 服务运行状态',
-    '审阅自动报告异常指标',
-    '维护工作台技术问题工单'
-  ],
-  '朱琦': [
-    '发布今日内容工坊排期内容',
-    '补录昨日内容曝光/互动数据',
-    '整理本周内容效果 TOP5'
-  ],
-  '小静': [
-    '回复客户中心所有私信未回',
-    '处理跟进看板待回复任务',
-    '更新 6 大平台申请进度'
-  ]
-};
-
-function dispatchDailyTasks() {
-  var today = new Date().toISOString().slice(0, 10);
-  var weekday = ['日','一','二','三','四','五','六'][new Date().getDay()];
-  // Get current user from sessionStorage
-  var u = (sessionStorage.getItem('herbalinn_user') || '');
-  var name = u ? (u.split('|')[0] || u) : '';
-  var tasks = TEAM_TASKS[name] || ['（本账号未配置任务模板）'];
-
-  var html = '<div class="daily-tasks-header"><div class="dt-title">今日任务 · ' + weekday + ' · ' + today + '</div>'
-    + '<div class="dt-user">' + (name || '未选择身份') + '</div></div>'
-    + '<div class="dt-list">'
-    + tasks.map(function(t, i) {
-        return '<label class="dt-item"><input type="checkbox" data-idx="' + i + '" data-user="' + name + '" data-task="' + t.replace(/"/g, '&quot;') + '" data-date="' + today + '"> <span>' + t + '</span></label>';
-      }).join('')
-    + '</div>'
-    + '<div style="margin-top:12px;display:flex;gap:8px"><button class="qbtn" onclick="saveTodayProgress()">保存进度</button><button class="qbtn" onclick="resetTodayTasks()">重置</button></div>';
-
-  document.getElementById('dailyTasksPanel').innerHTML = html;
-  loadTodayProgress();
+// 每日任务自动派发（服务器端生成，前端读取）
+function bjDateStr() {
+  var d = new Date(Date.now() + 8 * 3600000);
+  return d.toISOString().slice(0, 10);
 }
 
-async function saveTodayProgress() {
-  var checks = document.querySelectorAll('.dt-item input[type=checkbox]');
-  var done = [];
-  checks.forEach(function(c) {
-    if (c.checked) {
-      done.push({
-        user: c.dataset.user,
-        task: c.dataset.task,
-        date: c.dataset.date,
-        done_at: new Date().toISOString().replace('T', ' ').slice(0, 19)
-      });
+async function dispatchDailyTasks() {
+  var panel = document.getElementById('dailyTasksPanel');
+  var name = userName || '';
+  if (!name || name === '访客') {
+    panel.innerHTML = '<div class="empty">请先点击右上角选择身份</div>';
+    loadTeamOverview();
+    return;
+  }
+  try {
+    var tasks = await api('/api/daily-tasks?user=' + encodeURIComponent(name));
+    var weekday = ['日','一','二','三','四','五','六'][new Date(Date.now() + 8 * 3600000).getDay()];
+    var today = bjDateStr();
+    var html = '<div class="daily-tasks-header"><div class="dt-title">今日任务 · ' + weekday + ' · ' + today + '</div>'
+      + '<div class="dt-user">' + name + '</div></div><div class="dt-list">';
+    if (!tasks.length) {
+      html += '<div class="empty">今日暂无任务</div>';
+    } else {
+      html += tasks.map(function(t) {
+        var done = t.status === '已完成';
+        return '<label class="dt-item"><input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleTask(' + t.id + ', this)"> '
+          + '<span' + (done ? ' style="text-decoration:line-through;color:var(--t4)"' : '') + '>' + t.task + '</span>'
+          + '<em class="dt-cat">' + (t.category || '') + '</em></label>';
+      }).join('');
     }
-  });
-  // Persist in localStorage (no server roundtrip needed for progress)
-  localStorage.setItem('herbalinn_today_done', JSON.stringify(done));
-  toast('已保存 ' + done.length + ' 项完成');
+    html += '</div>';
+    panel.innerHTML = html;
+  } catch (e) {
+    panel.innerHTML = '<div class="empty">任务加载失败</div>';
+  }
+  loadTeamOverview();
 }
 
-function loadTodayProgress() {
-  var done = JSON.parse(localStorage.getItem('herbalinn_today_done') || '[]');
-  var checks = document.querySelectorAll('.dt-item input[type=checkbox]');
-  checks.forEach(function(c) {
-    var match = done.find(function(d) { return d.task === c.dataset.task && d.date === c.dataset.date; });
-    if (match) c.checked = true;
-  });
+async function toggleTask(id, el) {
+  var r = await api('/api/daily-tasks/' + id + '/toggle', { method: 'POST' });
+  if (r.ok) {
+    var span = el.parentElement.querySelector('span');
+    if (span) {
+      span.style.textDecoration = r.status === '已完成' ? 'line-through' : 'none';
+      span.style.color = r.status === '已完成' ? 'var(--t4)' : '';
+    }
+    loadTeamOverview();
+    toast(r.status === '已完成' ? '已完成' : '已恢复');
+  } else {
+    toast(r.error || '操作失败');
+  }
 }
 
-function resetTodayTasks() {
-  document.querySelectorAll('.dt-item input[type=checkbox]').forEach(function(c) { c.checked = false; });
-  localStorage.removeItem('herbalinn_today_done');
-  toast('已重置');
+async function loadTeamOverview() {
+  var el = document.getElementById('teamTasksPanel');
+  if (!el) return;
+  try {
+    var d = await api('/api/daily-tasks/overview');
+    var list = d.list || [];
+    if (!list.length) {
+      el.innerHTML = '<div class="empty">今日任务尚未生成（每天 8:00 自动派发）</div>';
+      return;
+    }
+    el.innerHTML = list.map(function(u) {
+      var pct = u.total ? Math.round(u.done / u.total * 100) : 0;
+      var color = pct === 100 ? 'var(--g3)' : (pct > 0 ? 'var(--orange)' : '#d1d9d3');
+      return '<div class="team-task-row">'
+        + '<div class="tt-name">' + u.user_name + '</div>'
+        + '<div class="tt-bar"><div class="tt-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>'
+        + '<div class="tt-num">' + u.done + '/' + u.total + '</div></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<div class="empty">总览加载失败</div>';
+  }
+}
+
+async function manualGenerateTasks() {
+  var r = await api('/api/daily-tasks/generate', { method: 'POST' });
+  if (r.ok) {
+    toast(r.generated > 0 ? '已派发 ' + r.generated + ' 条任务' : '今日任务已存在');
+    dispatchDailyTasks();
+  } else {
+    toast('派发失败');
+  }
 }
 async function loadDashboard(){
   updateDataCount();
