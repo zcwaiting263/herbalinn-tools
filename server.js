@@ -550,6 +550,10 @@ async function youzanIngestOrder(order) {
     return true;
   } catch (e) {
     console.log('有赞订单录入异常:', e.message);
+    try {
+      const errDetail = e.message + (e.stack ? ' @' + String(e.stack).split('\n')[1] : '');
+      await logActivity('youzan_error', '有赞订单录入异常: ' + errDetail, '', '有赞系统');
+    } catch (_) {}
     return false;
   }
 }
