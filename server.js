@@ -443,6 +443,29 @@ async function youzanApi(api, version, params = {}) {
   }
 }
 
+// 有赞敏感字段解密（单项解密接口）
+async function youzanDecrypt(cipherText) {
+  if (!cipherText) return '';
+  if (typeof cipherText !== 'string' || cipherText.indexOf('$1$') === -1) return cipherText; // 非密文直接返回
+  if (!YOUZAN_ACCESS_TOKEN) await youzanRefreshToken();
+  if (!YOUZAN_ACCESS_TOKEN) return '';
+  try {
+    const url = 'https://open.youzanyun.com/api/youzan.cloud.secret.decrypt.single/1.0.0?access_token=' + YOUZAN_ACCESS_TOKEN;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: cipherText })
+    });
+    const data = await resp.json();
+    if (data && data.success && data.data) return data.data;
+    console.log('有赞解密失败:', JSON.stringify(data).slice(0, 200));
+    return '';
+  } catch (e) {
+    console.log('有赞解密异常:', e.message);
+    return '';
+  }
+}
+
 // 有赞订单 → 工作台客户 + 订单记录（核心：自动接管、自动录入）
 async function youzanIngestOrder(order) {
   const now = new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19);
@@ -685,6 +708,14 @@ app.post('/api/youzan/pull', async (req, res) => {
     result.steps.push('exception: ' + e.message);
     res.json(result);
   }
+});
+
+// 有赞解密测试端点（排障用）
+app.post('/api/youzan/decrypt-test', async (req, res) => {
+  const src = (req.body && req.body.source) || '';
+  if (!src) return res.json({ error: '缺少 source 参数' });
+  const result = await youzanDecrypt(src);
+  res.json({ source: src.slice(0, 40) + '...', decrypted: result });
 });
 
 // 有赞状态查询端点（工作台内查看接入状态）
