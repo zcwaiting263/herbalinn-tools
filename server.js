@@ -541,7 +541,7 @@ async function youzanIngestOrder(order) {
 
     // 3. 录入订单
     await client.execute({
-      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,youzan_oid,item_id,sku,post_fee,buyer_message,youzan_status,order_type,source,pay_method,payment_no,goods_amount,shop_discount,success_time,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_district,receiver_address,buyer_nickname,buyer_phone,refund_status,refund_amount,distributor,coupon_name,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      sql: 'INSERT INTO orders (order_no,customer_no,product_type,quantity,amount,pay_status,pay_time,delivery_status,order_handler,youzan_oid,item_id,sku,post_fee,buyer_message,youzan_status,order_type,source,pay_method,payment_no,goods_amount,shop_discount,success_time,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_district,receiver_address,buyer_nickname,buyer_phone,refund_status,refund_amount,distributor,coupon_name,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
       args: ['YZ-' + orderNo, customerNo, productName, quantity, amount, '已支付', payTime, '待发货', '有赞自动', String(youzanOid), String(itemId), sku, postFee, buyerMessage, youzanStatus, orderType, source, payMethod, paymentNo, goodsAmount, shopDiscount, successTime, receiverName, receiverPhone, receiverProvince, receiverCity, receiverDistrict, receiverAddress, buyerNickname, buyerPhone, refundStatus, refundAmount, distributor, couponName, now]
     });
     await logActivity('youzan', '有赞订单 ' + orderNo + ' 自动录入 ¥' + amount + ' [' + productName + ']', customerNo, '有赞系统');
