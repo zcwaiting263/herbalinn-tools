@@ -714,8 +714,21 @@ app.post('/api/youzan/pull', async (req, res) => {
 app.post('/api/youzan/decrypt-test', async (req, res) => {
   const src = (req.body && req.body.source) || '';
   if (!src) return res.json({ error: '缺少 source 参数' });
-  const result = await youzanDecrypt(src);
-  res.json({ source: src.slice(0, 40) + '...', decrypted: result });
+  if (!YOUZAN_ACCESS_TOKEN) await youzanRefreshToken();
+  const url = 'https://open.youzanyun.com/api/youzan.cloud.secret.decrypt.single/1.0.0?access_token=' + YOUZAN_ACCESS_TOKEN;
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: src })
+    });
+    const text = await resp.text();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch (e) { parsed = { raw: text }; }
+    res.json({ http_status: resp.status, token_len: YOUZAN_ACCESS_TOKEN.length, result: parsed });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
 });
 
 // 有赞状态查询端点（工作台内查看接入状态）
