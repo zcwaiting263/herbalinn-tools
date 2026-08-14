@@ -461,10 +461,12 @@ async function youzanIngestOrder(order) {
     // 有赞金额单位是「元」，不是分
     const amount = Number(payInfo.payment || (subOrders[0] && subOrders[0].payment) || orderInfo.payment || 0);
     // 买家昵称/手机号可能被有赞加密（$...$1$ 格式），用 fans_id 兜底
+    const isEnc = (s) => typeof s === 'string' && s.indexOf('$1$') > -1;
     const rawName = buyerInfo.fans_nickname || addrInfo.receiver_name || '';
-    const isEncrypted = typeof rawName === 'string' && rawName.indexOf('$1$') > -1;
-    const buyerName = (!rawName || isEncrypted) ? ('有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : '')) : rawName;
-    const buyerPhone = buyerInfo.buyer_phone || addrInfo.receiver_tel || '';
+    const buyerName = (!rawName || isEnc(rawName)) ? ('有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : '')) : rawName;
+    // 买家手机号：加密时回退到收货人电话（也可能加密），再回退到空
+    const rawBuyerPhone = !isEnc(buyerInfo.buyer_phone) ? (buyerInfo.buyer_phone || '') : (!isEnc(addrInfo.receiver_tel) ? addrInfo.receiver_tel : '');
+    const buyerPhone = rawBuyerPhone;
     const buyerCity = addrInfo.delivery_province || '';
     const payTime = (orderInfo.pay_time || orderInfo.created || now).replace(/[T+]/g, ' ').slice(0, 19);
     const quantity = (subOrders[0] && subOrders[0].num) || 1;
@@ -486,13 +488,13 @@ async function youzanIngestOrder(order) {
     const goodsAmount = Number(payInfo.goods_amount || 0);
     const shopDiscount = Number(payInfo.discount_fee || payInfo.shop_discount || 0);
     const successTime = (orderInfo.success_time || '').replace(/[T+]/g, ' ').slice(0, 19);
-    const receiverName = addrInfo.receiver_name || '';
-    const receiverPhone = addrInfo.receiver_tel || buyerPhone || '';
+    const receiverName = isEnc(addrInfo.receiver_name) ? (buyerName || '') : (addrInfo.receiver_name || '');
+    const receiverPhone = isEnc(addrInfo.receiver_tel) ? '(已加密)' : (addrInfo.receiver_tel || '');
     const receiverProvince = addrInfo.delivery_province || '';
     const receiverCity = addrInfo.delivery_city || '';
     const receiverDistrict = addrInfo.delivery_district || '';
-    const receiverAddress = addrInfo.delivery_address || '';
-    const buyerNickname = buyerInfo.fans_nickname || '';
+    const receiverAddress = isEnc(addrInfo.delivery_address) ? '(已加密)' : (addrInfo.delivery_address || '');
+    const buyerNickname = isEnc(buyerInfo.fans_nickname) ? '(已加密)' : (buyerInfo.fans_nickname || '');
     const refundStatus = orderInfo.refund_state || orderInfo.refund_status || '';
     const refundAmount = Number((fi.refund_order && fi.refund_order.refund_fee) || 0);
     const distributor = orderInfo.salesman || fi.salesman || '';
