@@ -483,13 +483,15 @@ async function youzanIngestOrder(order) {
     const productName = (subOrders[0] && subOrders[0].title) || orderInfo.title || '有赞订单';
     // 有赞金额单位是「元」，不是分
     const amount = Number(payInfo.payment || (subOrders[0] && subOrders[0].payment) || orderInfo.payment || 0);
-    // 买家昵称/手机号可能被有赞加密（$...$1$ 格式），用 fans_id 兜底
+    // 买家昵称/手机号可能被有赞加密（$...$1$ 格式），加密则调用解密接口还原明文
     const isEnc = (s) => typeof s === 'string' && s.indexOf('$1$') > -1;
-    const rawName = buyerInfo.fans_nickname || addrInfo.receiver_name || '';
-    const buyerName = (!rawName || isEnc(rawName)) ? ('有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : '')) : rawName;
-    // 买家手机号：加密时回退到收货人电话（也可能加密），再回退到空
-    const rawBuyerPhone = !isEnc(buyerInfo.buyer_phone) ? (buyerInfo.buyer_phone || '') : (!isEnc(addrInfo.receiver_tel) ? addrInfo.receiver_tel : '');
-    const buyerPhone = rawBuyerPhone;
+    const dec = async (s, fb) => {
+      if (!isEnc(s)) return (s || fb || '');
+      const r = await youzanDecrypt(s);
+      return r || fb || '(已加密)';
+    };
+    const buyerName = await dec(buyerInfo.fans_nickname || addrInfo.receiver_name, '有赞买家' + (buyerInfo.fans_id ? '(ID:' + buyerInfo.fans_id + ')' : ''));
+    const buyerPhone = await dec(buyerInfo.buyer_phone, '');
     const buyerCity = addrInfo.delivery_province || '';
     const payTime = (orderInfo.pay_time || orderInfo.created || now).replace(/[T+]/g, ' ').slice(0, 19);
     const quantity = (subOrders[0] && subOrders[0].num) || 1;
@@ -511,13 +513,13 @@ async function youzanIngestOrder(order) {
     const goodsAmount = Number(payInfo.goods_amount || 0);
     const shopDiscount = Number(payInfo.discount_fee || payInfo.shop_discount || 0);
     const successTime = (orderInfo.success_time || '').replace(/[T+]/g, ' ').slice(0, 19);
-    const receiverName = isEnc(addrInfo.receiver_name) ? (buyerName || '') : (addrInfo.receiver_name || '');
-    const receiverPhone = isEnc(addrInfo.receiver_tel) ? '(已加密)' : (addrInfo.receiver_tel || '');
+    const receiverName = await dec(addrInfo.receiver_name, buyerName);
+    const receiverPhone = await dec(addrInfo.receiver_tel, '');
     const receiverProvince = addrInfo.delivery_province || '';
     const receiverCity = addrInfo.delivery_city || '';
     const receiverDistrict = addrInfo.delivery_district || '';
-    const receiverAddress = isEnc(addrInfo.delivery_address) ? '(已加密)' : (addrInfo.delivery_address || '');
-    const buyerNickname = isEnc(buyerInfo.fans_nickname) ? '(已加密)' : (buyerInfo.fans_nickname || '');
+    const receiverAddress = await dec(addrInfo.delivery_address, '');
+    const buyerNickname = await dec(buyerInfo.fans_nickname, '');
     const refundStatus = orderInfo.refund_state || orderInfo.refund_status || '';
     const refundAmount = Number((fi.refund_order && fi.refund_order.refund_fee) || 0);
     const distributor = orderInfo.salesman || fi.salesman || '';
