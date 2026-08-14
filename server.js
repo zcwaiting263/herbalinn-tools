@@ -94,6 +94,17 @@ async function initDB() {
     type TEXT, message TEXT, related_id TEXT,
     created_by TEXT DEFAULT 'system', created_at TEXT
   )`);
+  await client.execute(`CREATE TABLE IF NOT EXISTS daily_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_date TEXT NOT NULL,
+    user_name TEXT NOT NULL,
+    category TEXT,
+    task TEXT NOT NULL,
+    status TEXT DEFAULT '待处理',
+    completed_at TEXT,
+    auto_generated INTEGER DEFAULT 1,
+    created_at TEXT
+  )`);
 
   // 订单表字段迁移（兼容老数据库，逐列补加，已存在则跳过）
   const orderCols = [
@@ -682,6 +693,115 @@ app.get('/api/youzan/status', async (req, res) => {
 });
 
 // ============ 有赞模块结束 ============
+
+// ============ 每日任务自动派发模块 ============
+// 根据当天真实工作数据，为 6 位核心成员智能生成任务
+async function generateDailyTasks(date) {
+  const today = date || new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  const nowStr = new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19);
+  try {
+    const exists = (await client.execute({ sql: 'SELECT COUNT(*) as c FROM daily_tasks WHERE task_date=?', args: [today] })).rows[0].c;
+    if (exists > 0) return 0;
+
+    const q = async (sql) => { const r = await client.execute(sql); return r.rows[0] ? (r.rows[0].c || 0) : 0; };
+    const overdue = await q("SELECT COUNT(*) as c FROM followups WHERE result NOT IN ('已成交','已流失') AND next_followup_time IS NOT NULL AND next_followup_time < '" + nowStr + "'");
+    const noFU = await q("SELECT COUNT(*) as c FROM customers WHERE stage='新线索' AND customer_no NOT IN (SELECT DISTINCT customer_no FROM followups)");
+    const waitExp = await q("SELECT COUNT(*) as c FROM customers WHERE stage='待体验'");
+    const pendingContent = await q("SELECT COUNT(*) as c FROM contents WHERE status='待发布'");
+    const pendingPlatform = await q("SELECT COUNT(*) as c FROM platforms WHERE progress IN ('待跟进','申请中')");
+    const unpaid = await q("SELECT COUNT(*) as c FROM orders WHERE delivery_status='待发货'");
+    const waitReply = await q("SELECT COUNT(*) as c FROM followups WHERE result='待回复'");
+    const totalCustomers = await q("SELECT COUNT(*) as c FROM customers");
+    const paidOrders = await q("SELECT COUNT(*) as c FROM orders WHERE pay_status='已支付'");
+
+    const tasks = [
+      ['陈丹千', '管理', '审阅今日仪表盘：总客户 ' + totalCustomers + '、已支付订单 ' + paidOrders],
+      ['陈丹千', '管理', '批阅逾期跟进 ' + overdue + ' 位、待体验 ' + waitExp + ' 位'],
+      ['Amy', '客户', '跟进 ' + waitExp + ' 位待体验客户'],
+      ['Amy', '订单', '整理 ' + unpaid + ' 笔待发货订单'],
+      ['小廖', '增长', '处理 ' + overdue + ' 位逾期未跟进客户'],
+      ['小廖', '增长', '推进平台入驻 ' + pendingPlatform + ' 个待跟进'],
+      ['张成', '技术', '检查系统运行状态与有赞数据同步'],
+      ['张成', '技术', '审阅自动报告异常指标'],
+      ['朱琦', '内容', '发布今日排期内容（' + pendingContent + ' 篇待发布）'],
+      ['朱琦', '内容', '补录昨日内容曝光/互动数据'],
+      ['小静', '客服', '回复 ' + Math.max(noFU, waitReply) + ' 位客户未回私信'],
+      ['小静', '客服', '处理跟进看板待回复任务']
+    ];
+
+    for (const [name, cat, task] of tasks) {
+      await client.execute({ sql: 'INSERT INTO daily_tasks (task_date,user_name,category,task,status,auto_generated,created_at) VALUES (?,?,?,?,?,1,?)', args: [today, name, cat, task, '待处理', nowStr] });
+    }
+    await logActivity('daily_task', '每日任务已自动派发 ' + tasks.length + ' 条', today, 'system');
+    console.log('✅ 每日任务已自动派发 ' + tasks.length + ' 条（' + today + '）');
+    return tasks.length;
+  } catch (e) {
+    console.log('每日任务派发异常:', e.message);
+    return 0;
+  }
+}
+
+// 每天北京时间 8:00 之后生成当天任务（每 60 秒检查一次，兼容免费版服务器休眠）
+async function ensureTodayTasks() {
+  try {
+    const b = new Date(Date.now() + 8 * 3600000);
+    if (b.getHours() >= 8) {
+      await generateDailyTasks(b.toISOString().slice(0, 10));
+    }
+  } catch (e) { console.log('每日任务检查异常:', e.message); }
+}
+setInterval(ensureTodayTasks, 60 * 1000);
+ensureTodayTasks();
+
+// 团队总览：按成员分组统计完成率
+app.get('/api/daily-tasks/overview', async (req, res) => {
+  const date = req.query.date || new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  await ensureTodayTasks();
+  const rows = (await client.execute({ sql: 'SELECT * FROM daily_tasks WHERE task_date=? ORDER BY user_name, id', args: [date] })).rows;
+  const order = ['陈丹千', 'Amy', '小廖', '张成', '朱琦', '小静'];
+  const map = {};
+  rows.forEach(r => {
+    if (!map[r.user_name]) map[r.user_name] = { user_name: r.user_name, total: 0, done: 0, tasks: [] };
+    map[r.user_name].total++;
+    if (r.status === '已完成') map[r.user_name].done++;
+    map[r.user_name].tasks.push(r);
+  });
+  const list = order.map(n => map[n]).filter(Boolean).concat(Object.values(map).filter(u => order.indexOf(u.user_name) === -1));
+  res.json({ date, list });
+});
+
+// 任务列表（可按 user 过滤）
+app.get('/api/daily-tasks', async (req, res) => {
+  const date = req.query.date || new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  await ensureTodayTasks();
+  const user = req.query.user || '';
+  let rows;
+  if (user) {
+    rows = (await client.execute({ sql: 'SELECT * FROM daily_tasks WHERE task_date=? AND user_name=? ORDER BY id', args: [date, user] })).rows;
+  } else {
+    rows = (await client.execute({ sql: 'SELECT * FROM daily_tasks WHERE task_date=? ORDER BY user_name, id', args: [date] })).rows;
+  }
+  res.json(rows);
+});
+
+// 手动派发（测试/补发用）
+app.post('/api/daily-tasks/generate', async (req, res) => {
+  const date = (req.body && req.body.date) ? req.body.date : new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  const n = await generateDailyTasks(date);
+  res.json({ ok: true, generated: n });
+});
+
+// 勾选完成 / 取消完成
+app.post('/api/daily-tasks/:id/toggle', async (req, res) => {
+  const task = (await client.execute({ sql: 'SELECT * FROM daily_tasks WHERE id=?', args: [req.params.id] })).rows[0];
+  if (!task) return res.status(404).json({ error: '未找到任务' });
+  const newStatus = task.status === '已完成' ? '待处理' : '已完成';
+  const completedAt = newStatus === '已完成' ? new Date(Date.now() + 8 * 3600000).toISOString().replace('T', ' ').slice(0, 19) : null;
+  await client.execute({ sql: 'UPDATE daily_tasks SET status=?, completed_at=? WHERE id=?', args: [newStatus, completedAt, req.params.id] });
+  res.json({ ok: true, status: newStatus });
+});
+
+// ============ 每日任务模块结束 ============
 
 // 健康检查端点（用于监控和验证部署）
 app.get('/api/health', async (req, res) => {
